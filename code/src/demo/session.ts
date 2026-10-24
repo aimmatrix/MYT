@@ -14,6 +14,7 @@ export interface DemoAiState {
  typingUsers:{userId:string;name:string;chatId:string}[];
  busyChatIds:string[];
  votingChatIds:string[];
+ waitingChatIds:string[];
  errors:Record<string,string>;
 }
 export interface DemoSession {
@@ -54,7 +55,7 @@ export async function createDemoSession(source:MytFilePort, ai:DemoAi={simulateC
  const ok:ActionResult<unknown>={ok:true,value:null};
  let disposed=false;
  const uiListeners=new Set<()=>void>();
- let snapshot:DemoAiState={typingUsers:[],busyChatIds:[],votingChatIds:[],errors:{}};
+ let snapshot:DemoAiState={typingUsers:[],busyChatIds:[],votingChatIds:[],waitingChatIds:[],errors:{}};
  const background=new Set<AbortController>();
  const timeScale=Math.max(0,timing.timeScale??1);
  const between=(min:number,max:number)=>min+Math.max(0,Math.min(1,(timing.random??Math.random)()))*(max-min);
@@ -69,8 +70,9 @@ export async function createDemoSession(source:MytFilePort, ai:DemoAi={simulateC
  }
 
  const jobs=new Map<string,{controller:AbortController;chatId:string;typer:string|null}>();
+ const pendingConversations=new Set<string>();
  const retries=new Map<string,()=>void>();
- function update(errors=snapshot.errors){snapshot={errors,votingChatIds:[...new Set([...jobs.entries()].filter(([key])=>key.startsWith('poll:')).map(([,j])=>j.chatId))],busyChatIds:[...new Set([...jobs.values()].map(j=>j.chatId))],typingUsers:[...jobs.values()].filter(j=>j.typer).map(j=>({userId:j.typer!,name:DEMO_CAST.find(m=>m.id===j.typer)?.name??'Demo student',chatId:j.chatId}))};for(const fn of uiListeners)fn();}
+ function update(errors=snapshot.errors){snapshot={errors,waitingChatIds:[...pendingConversations],votingChatIds:[...new Set([...jobs.entries()].filter(([key])=>key.startsWith('poll:')).map(([,j])=>j.chatId))],busyChatIds:[...new Set([...jobs.values()].map(j=>j.chatId))],typingUsers:[...jobs.values()].filter(j=>j.typer).map(j=>({userId:j.typer!,name:DEMO_CAST.find(m=>m.id===j.typer)?.name??'Demo student',chatId:j.chatId}))};for(const fn of uiListeners)fn();}
  function run(key:string,chatId:string,typer:string|null,work:(signal:AbortSignal,active:()=>boolean,setTyping:(id:string|null)=>void)=>Promise<void>){
   if(disposed)return;jobs.get(key)?.controller.abort();const controller=new AbortController();jobs.set(key,{controller,chatId,typer});
   retries.set(chatId,()=>run(key,chatId,typer,work));update({...snapshot.errors,[chatId]:''});
@@ -91,14 +93,18 @@ export async function createDemoSession(source:MytFilePort, ai:DemoAi={simulateC
   return {memberIds,chatType:chatId.startsWith('dm:')?'private' as const:'group' as const,activity:activity?{title:activity.title,description:activity.description,area:activity.area,startAt:activity.timeOptions[0]?.startAt,costPence:activity.cost.amountPence,hostName:hosted?.hostName,viewerIsHost:hosted?.hostId===user.id}:undefined,trigger};
  }
  async function conversation(chatId:string,trigger?:string){
-  if(disposed)return;const members=await membersFor(chatId);if(!members.length)return;
+  if(disposed)return;const members=await membersFor(chatId);
+  if(!members.length){if(chatId.startsWith('group:')){pendingConversations.add(chatId);update();}return;}
+  pendingConversations.delete(chatId);
   run('chat:'+chatId,chatId,null,async(signal,active,setTyping)=>{
    const loaded=await original.load();if(!loaded.ok)throw new Error(loaded.error.message);
    const messages=loaded.value.value.messages.filter(m=>m.chatId===chatId).slice(-24).map(asText);
    const started=Date.now();
    const result=await ai.simulateChat(messages,signal,context(chatId,members.map(m=>m.id),trigger));
    await pause(Math.max(0,between(1400,2600)-(Date.now()-started)/Math.max(timeScale,0.001)),signal);
-   for(const reply of result.messages){if(!active())return;if(!members.some(m=>m.id===reply.authorId))continue;
+   const replies=result.messages.filter(reply=>members.some(m=>m.id===reply.authorId)&&reply.text.trim());
+   if(!replies.length)throw new Error("AI couldn’t produce a reply. Try again.");
+   for(const reply of replies){if(!active())return;if(!members.some(m=>m.id===reply.authorId))continue;
     setTyping(reply.authorId);
     await pause(Math.min(6500,Math.max(1800,1000+reply.text.length*between(35,55))),signal);
     if(!active())return;
@@ -161,6 +167,7 @@ export async function createDemoSession(source:MytFilePort, ai:DemoAi={simulateC
       if(disposed||controller.signal.aborted)return;
       await addMember(member);
       await actor(member.id)!.post('group:'+a.id,{kind:'text',text:[`I'd be up for ${record.title}! ${record.price===0?'Free works for me.':`£${record.price.toFixed(2)} works for me.`}`,"Just joined too. Looks like a good plan.","I'm in! Happy to meet outside beforehand.","Count me in as well."][index]});
+      if(pendingConversations.has('group:'+a.id))void conversation('group:'+a.id,'The viewer sent a message before anyone joined. Respond to their most recent message now that you have joined, even if a join announcement came after it.');
      }
     })().catch(error=>{if(!disposed&&!controller.signal.aborted)update({...snapshot.errors,['group:'+a.id]:error instanceof Error?error.message:'Demo students could not join.'});}).finally(()=>background.delete(controller));
    }else{
@@ -192,5 +199,5 @@ export async function createDemoSession(source:MytFilePort, ai:DemoAi={simulateC
    return result;
   },
  };
- return {files,user,repository,social,communityChanged,subscribe(fn){uiListeners.add(fn);return()=>{uiListeners.delete(fn);};},getSnapshot:()=>snapshot,retry(chatId){retries.get(chatId)?.();},dispose(){disposed=true;for(const controller of background)controller.abort();background.clear();for(const job of jobs.values())job.controller.abort();jobs.clear();uiListeners.clear();listeners.clear();}};
+ return {files,user,repository,social,communityChanged,subscribe(fn){uiListeners.add(fn);return()=>{uiListeners.delete(fn);};},getSnapshot:()=>snapshot,retry(chatId){retries.get(chatId)?.();},dispose(){disposed=true;pendingConversations.clear();for(const controller of background)controller.abort();background.clear();for(const job of jobs.values())job.controller.abort();jobs.clear();uiListeners.clear();listeners.clear();}};
 }

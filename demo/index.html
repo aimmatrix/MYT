@@ -54092,7 +54092,7 @@ const PollCard_1 = __require(43);
 const availability_1 = __require(32);
 const sampleGroup_1 = __require(44);
 const INTEREST_LABELS = { football: "Football", karting: "Go-karting", cinema: "Cinema", music: "Music", social: "Social", fitness: "Fitness", comedy: "Comedy", theatre: "Theatre" };
-const NO_DEMO_AI = { typingUsers: [], busyChatIds: [], votingChatIds: [], errors: {} };
+const NO_DEMO_AI = { typingUsers: [], busyChatIds: [], votingChatIds: [], waitingChatIds: [], errors: {} };
 const noSubscribe = () => () => { };
 const noSnapshot = () => NO_DEMO_AI;
 function SocialScreens(p) {
@@ -54241,7 +54241,7 @@ function Chat({ p, s, me, row, names, busy, act }) {
         setText("");
         p.onTyping(null);
     } return r; }, row.sample || p.demoSession ? "Message added to this sample session" : "Message saved on this device"); };
-    return (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)("div", { className: "myt-row", children: [(0, jsx_runtime_1.jsx)(ui_1.Button, { "aria-label": "Back to chats", onClick: () => p.navigate({ name: "chats" }), children: "\u2190" }), (0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)("h1", { className: "myt-chat-title", children: row.name }), (0, jsx_runtime_1.jsxs)("p", { className: "myt-small myt-muted", children: [members.length, " ", members.length === 1 ? "member" : "members", " \u00B7 ", online, " online"] })] }), (0, jsx_runtime_1.jsx)(ui_1.Button, { "aria-label": "Chat information", onClick: () => setSheet("info"), children: "\u24D8" })] }), pinned ? (0, jsx_runtime_1.jsxs)(ui_1.Button, { variant: "primary", onClick: () => p.navigate({ name: "plan", planId: pinned.id }), children: ["Plan confirmed \u00B7 ", new Date(pinned.startAt).toLocaleDateString("en-GB", { timeZone: "Europe/London" }), " \u00B7 ", pinned.meetingPoint] }) : null, p.demoSession ? (0, jsx_runtime_1.jsxs)(ui_1.Panel, { title: "Demo conversation \u00B7 AI is on", children: [(0, jsx_runtime_1.jsx)("p", { className: "myt-small myt-muted", children: "Fictional students reply and vote automatically. Recent messages, poll options and activity details are sent to OpenAI through temporary app files." }), p.demoState?.votingChatIds.includes(row.id) ? (0, jsx_runtime_1.jsx)("p", { role: "status", children: "Demo students are voting\u2026" }) : null, p.demoState?.errors[row.id] ? (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { role: "alert", children: p.demoState.errors[row.id] }), (0, jsx_runtime_1.jsx)(ui_1.Button, { onClick: () => p.demoSession?.retry(row.id), children: "Retry AI response" })] }) : null] }) : null, row.sample ? (0, jsx_runtime_1.jsxs)(ui_1.Panel, { title: "Fictional group chat", children: [(0, jsx_runtime_1.jsx)(ui_1.Switch, { label: "AI replies and poll votes", checked: ai.aiEnabled, onChange: sampleGroup_1.setSampleAiEnabled }), (0, jsx_runtime_1.jsx)("p", { className: "myt-small myt-muted", children: ai.aiEnabled ? "OpenAI generates replies and votes on polls you post. The last 24 messages in this sample chat are sent to OpenAI. These students are fictional. AI requests pass briefly through app files, readable by library collaborators, and are removed after processing." : "Scripted demo replies. Turn on AI for replies and votes from demo students." }), ai.aiBusy ? (0, jsx_runtime_1.jsx)("p", { role: "status", children: "Demo students are thinking\u2026" }) : null, ai.aiError ? (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { role: "alert", children: ai.aiError }), (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: ai.aiBusy, onClick: () => (0, sampleGroup_1.retrySampleAi)(me), children: "Retry AI reply" })] }) : null] }) : null, (0, jsx_runtime_1.jsxs)("div", { className: "myt-chat-log", role: "log", "aria-label": "Messages", "aria-live": "polite", children: [messages.length ? messages.map(m => (0, jsx_runtime_1.jsxs)(ui_1.ChatBubble, { mine: m.authorId === me, name: names[m.authorId] ?? "Student", children: [m.kind === "text" ? (0, jsx_runtime_1.jsx)("p", { children: m.text }) : (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(PollCard_1.PollCard, { message: m, votes: s.votes.filter(v => v.chatId === row.id && v.messageId === m.id && members.includes(v.voterId)), me: me, names: names, onVote: p.actions && !busy ? ids => void act(() => p.actions.vote(row.id, m.id, ids), row.sample || p.demoSession ? "Vote added to this demo session" : "Vote saved on this device") : undefined }), row.sample && ai.aiPollBusy.includes(m.id) ? (0, jsx_runtime_1.jsx)("p", { role: "status", className: "myt-small myt-muted", children: "Demo students are voting\u2026" }) : null, row.sample && ai.aiVotes.some(v => v.messageId === m.id) ? (0, jsx_runtime_1.jsx)("p", { className: "myt-small myt-muted", children: "Includes AI votes from fictional demo students." }) : null, row.sample && ai.aiPollErrors[m.id] ? (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { role: "alert", children: ai.aiPollErrors[m.id] }), (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: !ai.aiEnabled || ai.aiPollBusy.includes(m.id), onClick: () => (0, sampleGroup_1.retrySamplePollVotes)(m.id, me), children: "Retry AI votes" })] }) : null] }), (0, jsx_runtime_1.jsx)("time", { className: "myt-small myt-muted", children: new Date(m.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/London" }) })] }, m.id)) : (0, jsx_runtime_1.jsx)("p", { className: "myt-muted", children: "New crew, new plans. Say hello \uD83D\uDC4B" }), typing.length ? (0, jsx_runtime_1.jsxs)("p", { className: "myt-typing", children: [typing.map(t => t.name).join(", "), " typing", (0, jsx_runtime_1.jsx)("span", { children: "\u25CF" }), (0, jsx_runtime_1.jsx)("span", { children: "\u25CF" }), (0, jsx_runtime_1.jsx)("span", { children: "\u25CF" })] }) : null, (0, jsx_runtime_1.jsx)("div", { ref: end })] }), (0, jsx_runtime_1.jsx)("div", { className: "myt-chip-group", children: ["Hey everyone! 👋", "What time works?", "Looking forward to it!"].map(q => (0, jsx_runtime_1.jsx)(ui_1.Chip, { selected: false, disabled: !p.actions, onSelectedChange: () => { setText(q); p.onTyping(row.id); }, children: q }, q)) }), (0, jsx_runtime_1.jsxs)("div", { className: "myt-composer", children: [(0, jsx_runtime_1.jsx)(ui_1.Button, { "aria-label": "Add to chat", "aria-expanded": sheet === "add" || sheet === "poll", disabled: !p.actions, onClick: () => setSheet(sheet ? null : "add"), children: sheet ? "×" : "+" }), (0, jsx_runtime_1.jsx)(ui_1.Field, { label: "Message", placeholder: "Say something\u2026", value: text, maxLength: 1000, disabled: !p.actions || busy, onChange: v => { setText(v); p.onTyping(v ? row.id : null); } }), (0, jsx_runtime_1.jsx)(ui_1.Button, { variant: "primary", disabled: !p.actions || !text.trim() || text.trim().length > 1000, pending: busy, onClick: () => void send(), children: "Send" })] }), (0, jsx_runtime_1.jsx)("p", { className: "myt-small myt-muted", children: row.sample || p.demoSession ? "Sample chat with fictional demo students. Messages are not posted to real student chats." : "Only members can chat here. Collaborators with file access can read shared chat files." }), sheet === "add" ? (0, jsx_runtime_1.jsxs)(ui_1.BottomSheet, { title: "Add to chat", onClose: () => setSheet(null), children: [(0, jsx_runtime_1.jsx)(ui_1.Button, { onClick: () => { setPrefill(false); setSheet("poll"); }, children: "\u25A4 Poll" }), (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: !row.activity, onClick: () => { setPrefill(true); setSheet("poll"); }, children: "\u25F7 Time poll" }), (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: true, children: "Meet-up spot \u00B7 Coming soon" }), (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: true, children: "Photo \u00B7 Coming soon" })] }) : null, sheet === "poll" ? (0, jsx_runtime_1.jsx)(PollBuilder, { timeOptions: prefill ? row.activity?.timeOptions : undefined, busy: busy, onClose: () => setSheet(null), onPost: async (poll) => { if (p.actions)
+    return (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)("div", { className: "myt-row", children: [(0, jsx_runtime_1.jsx)(ui_1.Button, { "aria-label": "Back to chats", onClick: () => p.navigate({ name: "chats" }), children: "\u2190" }), (0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)("h1", { className: "myt-chat-title", children: row.name }), (0, jsx_runtime_1.jsxs)("p", { className: "myt-small myt-muted", children: [members.length, " ", members.length === 1 ? "member" : "members", " \u00B7 ", online, " online"] })] }), (0, jsx_runtime_1.jsx)(ui_1.Button, { "aria-label": "Chat information", onClick: () => setSheet("info"), children: "\u24D8" })] }), pinned ? (0, jsx_runtime_1.jsxs)(ui_1.Button, { variant: "primary", onClick: () => p.navigate({ name: "plan", planId: pinned.id }), children: ["Plan confirmed \u00B7 ", new Date(pinned.startAt).toLocaleDateString("en-GB", { timeZone: "Europe/London" }), " \u00B7 ", pinned.meetingPoint] }) : null, p.demoSession ? (0, jsx_runtime_1.jsxs)(ui_1.Panel, { title: "Demo conversation \u00B7 AI is on", children: [(0, jsx_runtime_1.jsx)("p", { className: "myt-small myt-muted", children: "Fictional students reply and vote automatically. Recent messages, poll options and activity details are sent to OpenAI through temporary app files." }), p.demoState?.waitingChatIds.includes(row.id) ? (0, jsx_runtime_1.jsx)("p", { role: "status", children: "Your message will get an AI reply when someone joins." }) : null, p.demoState?.votingChatIds.includes(row.id) ? (0, jsx_runtime_1.jsx)("p", { role: "status", children: "Demo students are voting\u2026" }) : null, p.demoState?.errors[row.id] ? (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { role: "alert", children: p.demoState.errors[row.id] }), (0, jsx_runtime_1.jsx)(ui_1.Button, { onClick: () => p.demoSession?.retry(row.id), children: "Retry AI response" })] }) : null] }) : null, row.sample ? (0, jsx_runtime_1.jsxs)(ui_1.Panel, { title: "Fictional group chat", children: [(0, jsx_runtime_1.jsx)("p", { className: "myt-small myt-muted", children: "AI replies and poll votes are on automatically." }), (0, jsx_runtime_1.jsx)("p", { className: "myt-small myt-muted", children: "OpenAI generates replies and votes on polls you post. Recent sample messages pass through temporary app files to OpenAI. These students are fictional." }), ai.aiBusy && !ai.typing ? (0, jsx_runtime_1.jsx)("p", { role: "status", children: "Waiting for an AI reply\u2026" }) : null, ai.aiError ? (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { role: "alert", children: ai.aiError }), (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: ai.aiBusy, onClick: () => (0, sampleGroup_1.retrySampleAi)(me), children: "Retry AI reply" })] }) : null] }) : null, (0, jsx_runtime_1.jsxs)("div", { className: "myt-chat-log", role: "log", "aria-label": "Messages", "aria-live": "polite", children: [messages.length ? messages.map(m => (0, jsx_runtime_1.jsxs)(ui_1.ChatBubble, { mine: m.authorId === me, name: names[m.authorId] ?? "Student", children: [m.kind === "text" ? (0, jsx_runtime_1.jsx)("p", { children: m.text }) : (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(PollCard_1.PollCard, { message: m, votes: s.votes.filter(v => v.chatId === row.id && v.messageId === m.id && members.includes(v.voterId)), me: me, names: names, onVote: p.actions && !busy ? ids => void act(() => p.actions.vote(row.id, m.id, ids), row.sample || p.demoSession ? "Vote added to this demo session" : "Vote saved on this device") : undefined }), row.sample && ai.aiPollBusy.includes(m.id) ? (0, jsx_runtime_1.jsx)("p", { role: "status", className: "myt-small myt-muted", children: "Demo students are voting\u2026" }) : null, row.sample && ai.aiVotes.some(v => v.messageId === m.id) ? (0, jsx_runtime_1.jsx)("p", { className: "myt-small myt-muted", children: "Includes AI votes from fictional demo students." }) : null, row.sample && ai.aiPollErrors[m.id] ? (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { role: "alert", children: ai.aiPollErrors[m.id] }), (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: !ai.aiEnabled || ai.aiPollBusy.includes(m.id), onClick: () => (0, sampleGroup_1.retrySamplePollVotes)(m.id, me), children: "Retry AI votes" })] }) : null] }), (0, jsx_runtime_1.jsx)("time", { className: "myt-small myt-muted", children: new Date(m.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/London" }) })] }, m.id)) : (0, jsx_runtime_1.jsx)("p", { className: "myt-muted", children: "New crew, new plans. Say hello \uD83D\uDC4B" }), typing.length ? (0, jsx_runtime_1.jsxs)("p", { className: "myt-typing", children: [typing.map(t => t.name).join(", "), " typing", (0, jsx_runtime_1.jsx)("span", { children: "\u25CF" }), (0, jsx_runtime_1.jsx)("span", { children: "\u25CF" }), (0, jsx_runtime_1.jsx)("span", { children: "\u25CF" })] }) : null, (0, jsx_runtime_1.jsx)("div", { ref: end })] }), (0, jsx_runtime_1.jsx)("div", { className: "myt-chip-group", children: ["Hey everyone! 👋", "What time works?", "Looking forward to it!"].map(q => (0, jsx_runtime_1.jsx)(ui_1.Chip, { selected: false, disabled: !p.actions, onSelectedChange: () => { setText(q); p.onTyping(row.id); }, children: q }, q)) }), (0, jsx_runtime_1.jsxs)("div", { className: "myt-composer", children: [(0, jsx_runtime_1.jsx)(ui_1.Button, { "aria-label": "Add to chat", "aria-expanded": sheet === "add" || sheet === "poll", disabled: !p.actions, onClick: () => setSheet(sheet ? null : "add"), children: sheet ? "×" : "+" }), (0, jsx_runtime_1.jsx)(ui_1.Field, { label: "Message", placeholder: "Say something\u2026", value: text, maxLength: 1000, disabled: !p.actions || busy, onChange: v => { setText(v); p.onTyping(v ? row.id : null); } }), (0, jsx_runtime_1.jsx)(ui_1.Button, { variant: "primary", disabled: !p.actions || !text.trim() || text.trim().length > 1000, pending: busy, onClick: () => void send(), children: "Send" })] }), (0, jsx_runtime_1.jsx)("p", { className: "myt-small myt-muted", children: row.sample || p.demoSession ? "Sample chat with fictional demo students. Messages are not posted to real student chats." : "Only members can chat here. Collaborators with file access can read shared chat files." }), sheet === "add" ? (0, jsx_runtime_1.jsxs)(ui_1.BottomSheet, { title: "Add to chat", onClose: () => setSheet(null), children: [(0, jsx_runtime_1.jsx)(ui_1.Button, { onClick: () => { setPrefill(false); setSheet("poll"); }, children: "\u25A4 Poll" }), (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: !row.activity, onClick: () => { setPrefill(true); setSheet("poll"); }, children: "\u25F7 Time poll" }), (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: true, children: "Meet-up spot \u00B7 Coming soon" }), (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: true, children: "Photo \u00B7 Coming soon" })] }) : null, sheet === "poll" ? (0, jsx_runtime_1.jsx)(PollBuilder, { timeOptions: prefill ? row.activity?.timeOptions : undefined, busy: busy, onClose: () => setSheet(null), onPost: async (poll) => { if (p.actions)
                     await act(async () => { const r = await p.actions.post(row.id, { kind: "poll", poll }); if (r.ok)
                         setSheet(null); return r; }, row.sample || p.demoSession ? "Poll added to this demo session" : "Poll saved on this device"); } }) : null, sheet === "info" ? (0, jsx_runtime_1.jsxs)(ui_1.BottomSheet, { title: "Chat information", onClose: () => setSheet(null), children: [(0, jsx_runtime_1.jsx)("p", { children: "Meet at public places. Group ideas aren't bookings, and votes are advice." }), (0, jsx_runtime_1.jsx)(ui_1.AvatarStack, { names: members.map(id => names[id] ?? "Student") }), members.filter(id => id !== me).map(id => (0, jsx_runtime_1.jsxs)("div", { className: "myt-row", children: [(0, jsx_runtime_1.jsx)("span", { children: names[id] ?? "Student" }), p.actions ? (0, jsx_runtime_1.jsx)(ui_1.Button, { disabled: busy, onClick: () => void act(() => p.actions.block(id, true), "Student blocked"), children: "Block" }) : null] }, id)), (0, jsx_runtime_1.jsx)("p", { children: "Report: not connected yet. No report will be sent." }), row.sample ? (0, jsx_runtime_1.jsx)(ui_1.Button, { onClick: () => { (0, sampleGroup_1.leaveSampleGroup)(); p.navigate({ name: "chats" }); }, children: "Leave sample group" }) : null] }) : null] });
 }
@@ -54365,14 +54365,7 @@ const SEED_VOTES = [
     { by: "leo", option: "sat-1230", ago: 590 },
     { by: "ben", option: "sat-1500", ago: 620 },
 ];
-const REPLIES = [
-    { by: "jamal", text: "Nice one! 👊" },
-    { by: "leo", text: "Haha yes, agreed." },
-    { by: "priya", text: "Love that, can't wait!" },
-    { by: "ben", text: "Good shout. See you Saturday." },
-    { by: "amara", text: "Perfect, I'm in 🙌" },
-];
-let state = { joined: false, joinedAt: 0, mine: [], replies: [], votes: [], aiVotes: [], aiPollBusy: [], aiPollErrors: {}, readAt: null, typing: null, replyCount: 0, aiEnabled: false, aiBusy: false, aiError: "" };
+let state = { joined: false, joinedAt: 0, mine: [], replies: [], votes: [], aiVotes: [], aiPollBusy: [], aiPollErrors: {}, readAt: null, typing: null, replyCount: 0, aiEnabled: true, aiBusy: false, aiError: "" };
 // The history is timed from the moment the module loads, so it reads as "earlier today" and "yesterday".
 const BASE = Date.now();
 const listeners = new Set();
@@ -54411,7 +54404,7 @@ const useSampleGroup = () => (0, react_1.useSyncExternalStore)(subscribe, export
 exports.useSampleGroup = useSampleGroup;
 const joinSampleGroup = () => {
     if (!state.joined)
-        set({ joined: true, joinedAt: Date.now() });
+        set({ joined: true, joinedAt: Date.now(), aiEnabled: true });
 };
 exports.joinSampleGroup = joinSampleGroup;
 function leaveSampleGroup() {
@@ -54428,23 +54421,6 @@ function sampleSocial(s, me) {
     const reads = s.readAt ? [{ schemaVersion: 1, chatId: exports.SAMPLE_GROUP_ID, userId: me, lastReadAt: s.readAt }] : [];
     const messages = [...HISTORY, ...s.replies, ...s.mine.map((m) => ({ ...m, authorId: me }))].sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
     return { messages, votes: [...HISTORY_VOTES, ...s.aiVotes, ...s.votes.map((v) => ({ ...v, voterId: me }))], reads };
-}
-function scheduleReply() {
-    const reply = REPLIES[state.replyCount % REPLIES.length];
-    const clear = (t) => void timers.delete(t);
-    const start = setTimeout(() => {
-        clear(start);
-        set({ typing: idOf(reply.by) });
-        const finish = setTimeout(() => {
-            clear(finish);
-            const message = {
-                schemaVersion: 1, id: uid("r"), chatId: exports.SAMPLE_GROUP_ID, authorId: idOf(reply.by), createdAt: new Date().toISOString(), kind: "text", text: reply.text,
-            };
-            set({ typing: null, replies: [...state.replies, message], replyCount: state.replyCount + 1 });
-        }, 1800);
-        timers.add(finish);
-    }, 900);
-    timers.add(start);
 }
 const ok = { ok: true, value: null };
 /**
@@ -54471,12 +54447,8 @@ function withSampleGroup(base, me) {
                 ...(input.kind === "text" ? { kind: "text", text } : { kind: "poll", poll: input.poll }),
             };
             set({ mine: [...state.mine, message], readAt: message.createdAt });
-            if (input.kind === "text") {
-                if (state.aiEnabled)
-                    void scheduleAiReply(me);
-                else
-                    scheduleReply();
-            }
+            if (input.kind === "text" && state.aiEnabled)
+                void scheduleAiReply(me);
             if (input.kind === "poll" && state.aiEnabled)
                 void scheduleAiPollVotes(message, me);
             return ok;
@@ -54522,24 +54494,30 @@ function scheduleAiReply(me) {
     cancelAi();
     const controller = new AbortController();
     aiController = controller;
-    set({ aiBusy: true, aiError: "", typing: exports.SAMPLE_MEMBER_IDS[state.replyCount % exports.SAMPLE_MEMBER_IDS.length] });
+    set({ aiBusy: true, aiError: "", typing: null });
     aiQueue = aiQueue.catch(() => { }).then(async () => {
         if (controller.signal.aborted)
             return;
-        const timer = setTimeout(() => controller.abort(), 35000);
+        const timer = setTimeout(() => controller.abort(), 60000);
         try {
             const messages = sampleSocial(state, me).messages.map(m => ({ authorId: m.authorId, text: m.kind === "text" ? m.text : `Poll: ${m.poll.question}` }));
-            const result = await (0, client_1.simulateChat)(messages, controller.signal);
-            for (const reply of result.messages) {
+            const started = Date.now();
+            const result = await (0, client_1.simulateChat)(messages, controller.signal, { memberIds: [...exports.SAMPLE_MEMBER_IDS], chatType: "group", activity: { title: exports.SAMPLE_GROUP_NAME, description: exports.SAMPLE_GROUP_BLURB, area: "London", costPence: null } });
+            const replies = result.messages.filter(reply => exports.SAMPLE_MEMBER_IDS.includes(reply.authorId) && reply.text.trim());
+            if (!replies.length)
+                throw new Error("AI couldn't produce a reply. Try again.");
+            await waitForReply(Math.max(0, 1600 - (Date.now() - started)), controller.signal);
+            for (const reply of replies) {
                 if (controller.signal.aborted || !state.joined || !state.aiEnabled)
                     return;
                 if (!exports.SAMPLE_MEMBER_IDS.includes(reply.authorId))
                     continue;
                 set({ typing: reply.authorId });
-                await new Promise(resolve => setTimeout(resolve, 900));
+                await waitForReply(Math.min(6500, Math.max(1800, 1000 + reply.text.length * 40)), controller.signal);
                 if (controller.signal.aborted || !state.joined || !state.aiEnabled)
                     return;
-                set({ replies: [...state.replies, { schemaVersion: 1, id: uid("ai"), chatId: exports.SAMPLE_GROUP_ID, authorId: reply.authorId, createdAt: new Date().toISOString(), kind: "text", text: reply.text }], replyCount: state.replyCount + 1 });
+                set({ replies: [...state.replies, { schemaVersion: 1, id: uid("ai"), chatId: exports.SAMPLE_GROUP_ID, authorId: reply.authorId, createdAt: new Date().toISOString(), kind: "text", text: reply.text }], replyCount: state.replyCount + 1, typing: null });
+                await waitForReply(1200, controller.signal);
             }
         }
         catch (e) {
@@ -54595,6 +54573,18 @@ function retrySamplePollVotes(messageId, me) {
     const message = state.mine.find(m => m.id === messageId);
     if (message?.kind === "poll")
         void scheduleAiPollVotes(message, me);
+}
+function waitForReply(ms, signal) {
+    return new Promise((resolve, reject) => {
+        if (signal.aborted) {
+            reject(new Error("AI reply cancelled or timed out."));
+            return;
+        }
+        const finish = () => { signal.removeEventListener("abort", cancel); resolve(); };
+        const timer = setTimeout(finish, ms);
+        const cancel = () => { clearTimeout(timer); signal.removeEventListener("abort", cancel); reject(new Error("AI reply cancelled or timed out.")); };
+        signal.addEventListener("abort", cancel, { once: true });
+    });
 }
 
 },
@@ -58580,7 +58570,7 @@ async function createDemoSession(source, ai = { simulateChat: client_1.simulateC
     const ok = { ok: true, value: null };
     let disposed = false;
     const uiListeners = new Set();
-    let snapshot = { typingUsers: [], busyChatIds: [], votingChatIds: [], errors: {} };
+    let snapshot = { typingUsers: [], busyChatIds: [], votingChatIds: [], waitingChatIds: [], errors: {} };
     const background = new Set();
     const timeScale = Math.max(0, timing.timeScale ?? 1);
     const between = (min, max) => min + Math.max(0, Math.min(1, (timing.random ?? Math.random)())) * (max - min);
@@ -58597,8 +58587,9 @@ async function createDemoSession(source, ai = { simulateChat: client_1.simulateC
         });
     }
     const jobs = new Map();
+    const pendingConversations = new Set();
     const retries = new Map();
-    function update(errors = snapshot.errors) { snapshot = { errors, votingChatIds: [...new Set([...jobs.entries()].filter(([key]) => key.startsWith('poll:')).map(([, j]) => j.chatId))], busyChatIds: [...new Set([...jobs.values()].map(j => j.chatId))], typingUsers: [...jobs.values()].filter(j => j.typer).map(j => ({ userId: j.typer, name: identity_1.DEMO_CAST.find(m => m.id === j.typer)?.name ?? 'Demo student', chatId: j.chatId })) }; for (const fn of uiListeners)
+    function update(errors = snapshot.errors) { snapshot = { errors, waitingChatIds: [...pendingConversations], votingChatIds: [...new Set([...jobs.entries()].filter(([key]) => key.startsWith('poll:')).map(([, j]) => j.chatId))], busyChatIds: [...new Set([...jobs.values()].map(j => j.chatId))], typingUsers: [...jobs.values()].filter(j => j.typer).map(j => ({ userId: j.typer, name: identity_1.DEMO_CAST.find(m => m.id === j.typer)?.name ?? 'Demo student', chatId: j.chatId })) }; for (const fn of uiListeners)
         fn(); }
     function run(key, chatId, typer, work) {
         if (disposed)
@@ -58638,8 +58629,14 @@ async function createDemoSession(source, ai = { simulateChat: client_1.simulateC
         if (disposed)
             return;
         const members = await membersFor(chatId);
-        if (!members.length)
+        if (!members.length) {
+            if (chatId.startsWith('group:')) {
+                pendingConversations.add(chatId);
+                update();
+            }
             return;
+        }
+        pendingConversations.delete(chatId);
         run('chat:' + chatId, chatId, null, async (signal, active, setTyping) => {
             const loaded = await original.load();
             if (!loaded.ok)
@@ -58648,7 +58645,10 @@ async function createDemoSession(source, ai = { simulateChat: client_1.simulateC
             const started = Date.now();
             const result = await ai.simulateChat(messages, signal, context(chatId, members.map(m => m.id), trigger));
             await pause(Math.max(0, between(1400, 2600) - (Date.now() - started) / Math.max(timeScale, 0.001)), signal);
-            for (const reply of result.messages) {
+            const replies = result.messages.filter(reply => members.some(m => m.id === reply.authorId) && reply.text.trim());
+            if (!replies.length)
+                throw new Error("AI couldn’t produce a reply. Try again.");
+            for (const reply of replies) {
                 if (!active())
                     return;
                 if (!members.some(m => m.id === reply.authorId))
@@ -58743,6 +58743,8 @@ async function createDemoSession(source, ai = { simulateChat: client_1.simulateC
                             return;
                         await addMember(member);
                         await actor(member.id).post('group:' + a.id, { kind: 'text', text: [`I'd be up for ${record.title}! ${record.price === 0 ? 'Free works for me.' : `£${record.price.toFixed(2)} works for me.`}`, "Just joined too. Looks like a good plan.", "I'm in! Happy to meet outside beforehand.", "Count me in as well."][index] });
+                        if (pendingConversations.has('group:' + a.id))
+                            void conversation('group:' + a.id, 'The viewer sent a message before anyone joined. Respond to their most recent message now that you have joined, even if a join announcement came after it.');
                     }
                 })().catch(error => { if (!disposed && !controller.signal.aborted)
                     update({ ...snapshot.errors, ['group:' + a.id]: error instanceof Error ? error.message : 'Demo students could not join.' }); }).finally(() => background.delete(controller));
@@ -58808,7 +58810,7 @@ async function createDemoSession(source, ai = { simulateChat: client_1.simulateC
             return result;
         },
     };
-    return { files, user, repository, social, communityChanged, subscribe(fn) { uiListeners.add(fn); return () => { uiListeners.delete(fn); }; }, getSnapshot: () => snapshot, retry(chatId) { retries.get(chatId)?.(); }, dispose() { disposed = true; for (const controller of background)
+    return { files, user, repository, social, communityChanged, subscribe(fn) { uiListeners.add(fn); return () => { uiListeners.delete(fn); }; }, getSnapshot: () => snapshot, retry(chatId) { retries.get(chatId)?.(); }, dispose() { disposed = true; pendingConversations.clear(); for (const controller of background)
             controller.abort(); background.clear(); for (const job of jobs.values())
             job.controller.abort(); jobs.clear(); uiListeners.clear(); listeners.clear(); } };
 }

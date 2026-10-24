@@ -67,14 +67,6 @@ const SEED_VOTES: Array<{ by: Member; option: string; ago: number }> = [
   { by: "ben", option: "sat-1500", ago: 620 },
 ];
 
-const REPLIES: Array<{ by: Member; text: string }> = [
-  { by: "jamal", text: "Nice one! 👊" },
-  { by: "leo", text: "Haha yes, agreed." },
-  { by: "priya", text: "Love that, can't wait!" },
-  { by: "ben", text: "Good shout. See you Saturday." },
-  { by: "amara", text: "Perfect, I'm in 🙌" },
-];
-
 interface State {
   joined: boolean;
   joinedAt: number;
@@ -92,7 +84,7 @@ interface State {
   aiError: string;
 }
 
-let state: State = { joined: false, joinedAt: 0, mine: [], replies: [], votes: [], aiVotes: [], aiPollBusy: [], aiPollErrors: {}, readAt: null, typing: null, replyCount: 0, aiEnabled: false, aiBusy: false, aiError: "" };
+let state: State = { joined: false, joinedAt: 0, mine: [], replies: [], votes: [], aiVotes: [], aiPollBusy: [], aiPollErrors: {}, readAt: null, typing: null, replyCount: 0, aiEnabled: true, aiBusy: false, aiError: "" };
 // The history is timed from the moment the module loads, so it reads as "earlier today" and "yesterday".
 const BASE = Date.now();
 const listeners = new Set<() => void>();
@@ -132,7 +124,7 @@ export const getSnapshot = () => state;
 export const useSampleGroup = () => useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
 export const joinSampleGroup = () => {
-  if (!state.joined) set({ joined: true, joinedAt: Date.now() });
+  if (!state.joined) set({ joined: true, joinedAt: Date.now(), aiEnabled: true });
 };
 export function leaveSampleGroup() {
   cancelAi(); cancelPollVotes();
@@ -149,24 +141,6 @@ export function sampleSocial(s: State, me: string): Pick<SocialData, "messages" 
     (a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id),
   );
   return { messages, votes: [...HISTORY_VOTES, ...s.aiVotes, ...s.votes.map((v) => ({ ...v, voterId: me }))], reads };
-}
-
-function scheduleReply() {
-  const reply = REPLIES[state.replyCount % REPLIES.length];
-  const clear = (t: ReturnType<typeof setTimeout>) => void timers.delete(t);
-  const start = setTimeout(() => {
-    clear(start);
-    set({ typing: idOf(reply.by) });
-    const finish = setTimeout(() => {
-      clear(finish);
-      const message: ChatMessage = {
-        schemaVersion: 1, id: uid("r"), chatId: SAMPLE_GROUP_ID, authorId: idOf(reply.by), createdAt: new Date().toISOString(), kind: "text", text: reply.text,
-      };
-      set({ typing: null, replies: [...state.replies, message], replyCount: state.replyCount + 1 });
-    }, 1800);
-    timers.add(finish);
-  }, 900);
-  timers.add(start);
 }
 
 const ok = { ok: true as const, value: null };
@@ -193,7 +167,7 @@ export function withSampleGroup(base: SocialRepository | null, me: string): Soci
         ...(input.kind === "text" ? { kind: "text" as const, text } : { kind: "poll" as const, poll: input.poll }),
       };
       set({ mine: [...state.mine, message], readAt: message.createdAt });
-      if (input.kind === "text") { if (state.aiEnabled) void scheduleAiReply(me); else scheduleReply(); }
+      if (input.kind === "text" && state.aiEnabled) void scheduleAiReply(me);
       if (input.kind === "poll" && state.aiEnabled) void scheduleAiPollVotes(message as ChatMessage & {kind:"poll"},me);
       return ok;
     },
@@ -231,20 +205,25 @@ function scheduleAiReply(me: string): Promise<void> {
   // A fresh user message supersedes any response still being generated.
   cancelAi();
   const controller = new AbortController(); aiController = controller;
-  set({ aiBusy: true, aiError: "", typing: SAMPLE_MEMBER_IDS[state.replyCount % SAMPLE_MEMBER_IDS.length] });
+  set({ aiBusy: true, aiError: "", typing: null });
   aiQueue = aiQueue.catch(()=>{}).then(async () => {
     if (controller.signal.aborted) return;
-    const timer = setTimeout(()=>controller.abort(),35000);
+    const timer = setTimeout(()=>controller.abort(),60000);
     try {
       const messages = sampleSocial(state,me).messages.map(m=>({authorId:m.authorId,text:m.kind==="text"?m.text:`Poll: ${m.poll.question}`}));
-      const result = await simulateChat(messages,controller.signal);
-      for (const reply of result.messages) {
+      const started=Date.now();
+      const result = await simulateChat(messages,controller.signal,{memberIds:[...SAMPLE_MEMBER_IDS],chatType:"group",activity:{title:SAMPLE_GROUP_NAME,description:SAMPLE_GROUP_BLURB,area:"London",costPence:null}});
+      const replies=result.messages.filter(reply=>SAMPLE_MEMBER_IDS.includes(reply.authorId)&&reply.text.trim());
+      if(!replies.length)throw new Error("AI couldn't produce a reply. Try again.");
+      await waitForReply(Math.max(0,1600-(Date.now()-started)),controller.signal);
+      for (const reply of replies) {
         if (controller.signal.aborted || !state.joined || !state.aiEnabled) return;
         if (!SAMPLE_MEMBER_IDS.includes(reply.authorId)) continue;
         set({ typing: reply.authorId });
-        await new Promise<void>(resolve=>setTimeout(resolve,900));
+        await waitForReply(Math.min(6500,Math.max(1800,1000+reply.text.length*40)),controller.signal);
         if (controller.signal.aborted || !state.joined || !state.aiEnabled) return;
-        set({ replies:[...state.replies,{schemaVersion:1,id:uid("ai"),chatId:SAMPLE_GROUP_ID,authorId:reply.authorId,createdAt:new Date().toISOString(),kind:"text",text:reply.text}],replyCount:state.replyCount+1 });
+        set({ replies:[...state.replies,{schemaVersion:1,id:uid("ai"),chatId:SAMPLE_GROUP_ID,authorId:reply.authorId,createdAt:new Date().toISOString(),kind:"text",text:reply.text}],replyCount:state.replyCount+1,typing:null });
+        await waitForReply(1200,controller.signal);
       }
     } catch (e) { if (aiController===controller && state.aiEnabled) set({aiError:e instanceof Error?e.message:"AI chat unavailable."}); }
     finally { clearTimeout(timer); if(aiController===controller){aiController=null;set({aiBusy:false,typing:null});} }
@@ -275,4 +254,14 @@ export function retrySamplePollVotes(messageId:string,me:string) {
   if(!state.aiEnabled || state.aiPollBusy.includes(messageId))return;
   const message=state.mine.find(m=>m.id===messageId);
   if(message?.kind==="poll")void scheduleAiPollVotes(message,me);
+}
+
+function waitForReply(ms:number,signal:AbortSignal):Promise<void>{
+ return new Promise((resolve,reject)=>{
+  if(signal.aborted){reject(new Error("AI reply cancelled or timed out."));return;}
+  const finish=()=>{signal.removeEventListener("abort",cancel);resolve();};
+  const timer=setTimeout(finish,ms);
+  const cancel=()=>{clearTimeout(timer);signal.removeEventListener("abort",cancel);reject(new Error("AI reply cancelled or timed out."));};
+  signal.addEventListener("abort",cancel,{once:true});
+ });
 }

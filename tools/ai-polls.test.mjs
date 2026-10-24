@@ -11,13 +11,13 @@ const env={OPENAI_API_KEY:'test-secret'};
 const mock=v=>async()=>new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(v)}]}]}));
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 async function settle(group){for(let i=0;i<100&&group.getSnapshot().aiPollBusy.length;i++)await pause(5);assert.deepEqual(group.getSnapshot().aiPollBusy,[]);}
-function sample(pollFn){
+function sample(pollFn,chatFn=async()=>({messages:[]})){
  const cache=new Map();
  function load(file){
   file=resolve(file);if(cache.has(file))return cache.get(file).exports;
   const module={exports:{}};cache.set(file,module);
   const js=ts.transpileModule(readFileSync(file,'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
-  const local=name=>name==='../ai/client'?{simulatePollVotes:pollFn,simulateChat:async()=>({messages:[]})}:name.startsWith('.')?load(resolve(dirname(file),name+'.ts')):require(name);
+  const local=name=>name==='../ai/client'?{simulatePollVotes:pollFn,simulateChat:chatFn}:name.startsWith('.')?load(resolve(dirname(file),name+'.ts')):require(name);
   new Function('require','module','exports',js)(local,module,module.exports);return module.exports;
  }
  return load('MYT/code/src/demo/sampleGroup.ts');
@@ -46,7 +46,7 @@ test('sample poll collects five AI votes, user vote stays separate, retry does n
  await actions.vote(group.SAMPLE_GROUP_ID,message.id,[]);assert.equal(group.getSnapshot().aiVotes.length,5);group.leaveSampleGroup();
 });
 test('polls posted with AI off vote when enabled; real chats never trigger AI votes',async()=>{
- let calls=0,posts=0;const group=sample(async()=>{calls++;return {votes:[{voterId:CAST[0].id,optionIds:['food']}]};});group.joinSampleGroup();
+ let calls=0,posts=0;const group=sample(async()=>{calls++;return {votes:[{voterId:CAST[0].id,optionIds:['food']}]};});group.joinSampleGroup();group.setSampleAiEnabled(false);
  const actions=group.withSampleGroup({post:async()=>{posts++;return {ok:true,value:null};}},'viewer');
  await actions.post(group.SAMPLE_GROUP_ID,{kind:'poll',poll});assert.equal(calls,0);group.setSampleAiEnabled(true);await settle(group);assert.equal(calls,1);
  await actions.post('group:real',{kind:'poll',poll});assert.equal(calls,1);assert.equal(posts,1);group.leaveSampleGroup();
@@ -71,4 +71,13 @@ test('private AI replies are restricted to the actual demo friend',async()=>{
 test('event poll votes include only selected demo group members, including Sofia',async()=>{
  const result=await simulatePollVotes({poll,memberIds:['demo-cast-sofia'],messages:[]},{env,fetchImpl:mock({votes:[{voterId:'demo-cast-sofia',optionIds:['food']},{voterId:'demo-cast-jamal',optionIds:['coffee']}]})});
  assert.deepEqual(result.votes,[{voterId:'demo-cast-sofia',optionIds:['food']}]);
+});
+
+test('legacy sample group enables AI on join and sends hi to the model, never to canned replies',async()=>{
+ let received;
+ const group=sample(async()=>({votes:[]}),async messages=>{received=messages;throw Error('AI offline');});group.joinSampleGroup();
+ assert.equal(group.getSnapshot().aiEnabled,true);assert.deepEqual(group.getSnapshot().replies,[]);assert.equal(group.getSnapshot().typing,null);
+ await group.withSampleGroup(null,'viewer').post(group.SAMPLE_GROUP_ID,{kind:'text',text:'hi'});
+ for(let i=0;i<100&&!group.getSnapshot().aiError;i++)await pause(5);
+ assert.equal(received.at(-1).text,'hi');assert.equal(group.getSnapshot().aiError,'AI offline');assert.deepEqual(group.getSnapshot().replies,[]);group.leaveSampleGroup();
 });

@@ -62,3 +62,16 @@ test('created-event participants join gradually with no typing; exit cancels del
  }finally{session.dispose();}
  const next=await setup({}, {timeScale:0.02,random:()=>0});await make(next.session,'cancelled');next.session.dispose();await new Promise(r=>setTimeout(r,150));const r=await next.session.repository.loadInterests('community:cancelled');assert.equal(r.value.value.length,1);
 });
+
+test('hi sent before anyone joins a new group gets an AI reply after the first participant arrives',async()=>{
+ const {session,calls}=await setup({}, {timeScale:0.02,random:()=>0});
+ try{
+  const record={kind:'event',id:'early-message',title:'Football and pizza',location:'Campus pitch',startsAt:'2030-10-26T18:00:00Z',price:8,description:'After class',hostId:session.user.id,hostName:'You'};
+  await session.files.writeText(communityPath(record),JSON.stringify(record),{overwrite:false});await session.communityChanged(record);
+  const chat='group:community:early-message';await session.social.post(chat,{kind:'text',text:'hi'});
+  await until(()=>session.getSnapshot().waitingChatIds.includes(chat));assert.equal(calls.length,0);
+  await until(()=>calls.some(c=>c.kind==='chat'));assert.ok(calls[0].messages.some(m=>m.authorId==='demo-viewer'&&m.text==='hi'));assert.match(calls[0].context.trigger,/before anyone joined/);
+  await until(async()=>(await social(session)).messages.some(m=>m.chatId===chat&&m.text?.includes("I'd love")));
+  assert.ok(!session.getSnapshot().waitingChatIds.includes(chat));
+ }finally{session.dispose();}
+});
