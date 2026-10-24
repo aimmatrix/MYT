@@ -17,15 +17,18 @@ MYT never books tickets. Event links go to the original organiser's listing.
 ## How it's built
 
 - **App** (`code/`): React 19 on the Lightfern SDK. Each person writes only their own JSON records under `data/` (profiles, interests, votes, attendance, chats). File watching syncs changes between people. Presence runs over one multiplayer room (`myt-v1`). `host.ts` is the only boundary between the app and the SDK.
-- **Activity importer** (`tools/refresh-sources.mjs`): a Node 22 script that normalises listings from Ticketmaster, Skiddle, Luma, SerpApi, Google Places, OpenStreetMap, TMDB and MovieGlu into `data/activities.json`. API keys stay in a private env file and never reach the bundle. See [tools/README.md](tools/README.md).
+- **Activity importer** (`tools/refresh-sources.mjs`): a Node 22 script that normalises listings from Ticketmaster, Skiddle, Luma, SerpApi, Google Places, OpenStreetMap, TMDB and MovieGlu into `data/activities.json`. API keys load from `tools/api.env` and never reach the bundle. See [tools/README.md](tools/README.md).
 - **AI demo students** (`tools/ai-*.mjs`): a small server that uses OpenAI to write replies and poll votes for fictional, clearly labelled sample students. It's there so you can try the social flow solo.
 - **Browser demo** (`demo/index.html`): a standalone build with fictional fixture accounts. It never writes to the shared data folder.
 
 ## Run
 
 ```sh
-# Refresh the activity catalog (keys in a private env file; see tools/api.env.example)
-node --env-file=/path/to/api.env tools/refresh-sources.mjs
+# Refresh the activity catalog (judging keys are included in tools/api.env)
+node --env-file=tools/api.env tools/refresh-sources.mjs
+
+# Start the AI demo-student server (tools/openai.env is shared with judges separately)
+node --env-file=tools/openai.env tools/ai-server.mjs
 
 # Tests
 node --test tools/*.test.mjs

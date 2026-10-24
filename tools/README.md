@@ -7,15 +7,15 @@ The Lightfern app reads `data/activities.json` through its existing repository a
 From the `MYT` directory:
 
 ```sh
-node --env-file=/private/tmp/myt-secrets/api.env tools/refresh-sources.mjs
+node --env-file=tools/api.env tools/refresh-sources.mjs
 ```
 
-This machine's private configuration is at `/private/tmp/myt-secrets/api.env` (directory mode 0700, file mode 0600). Skiddle, Ticketmaster, Google Places and SerpApi are configured with existing account keys. This is temporary storage and may be cleared on restart; keep a private copy outside the shared Lightfern workspace for longer use. `api.env.example` lists the remaining credentials. Do not put real keys in this shared workspace, its notes, source code or Git.
+Working keys for Ticketmaster, Skiddle, SerpApi, Google Places and Eventbrite are committed in `tools/api.env` for hackathon judging, so the importer runs as-is. They will be rotated after judging. `api.env.example` lists every supported credential.
 
 To select providers or test without changing shared data:
 
 ```sh
-node --env-file=/private/tmp/myt-secrets/api.env tools/refresh-sources.mjs --providers=luma,skiddle --dry-run
+node --env-file=tools/api.env tools/refresh-sources.mjs --providers=luma,skiddle --dry-run
 node --test tools/providers.test.mjs
 ```
 
@@ -82,7 +82,7 @@ The local AI server serves the built demo and calls the OpenAI Responses API usi
 
 ```sh
 node MYT/tools/build-demo.cjs
-node --env-file=/private/tmp/myt-secrets/openai.env MYT/tools/ai-server.mjs
+node --env-file=tools/openai.env tools/ai-server.mjs
 ```
 
 Open **http://127.0.0.1:8787**. Complete the demo onboarding (simulated email code `123456`), then:
@@ -90,7 +90,7 @@ Open **http://127.0.0.1:8787**. Complete the demo onboarding (simulated email co
 - **Discover → Find my AI picks**: recommends up to six existing catalog events using interests, available time, budget and previously interested event IDs. Filters still determine the candidate list. Names, email addresses and account IDs are omitted. Picks reset when profile, filters or catalog IDs change; requests only happen on click. Unknown prices/times remain unknown; AI chooses the order; explanations of interest and price are built from catalog facts, and the original listing and deterministic fit reasons stay visible.
 - **Chats → Saturday football crew → Join group**: send a message; AI replies and poll votes are enabled automatically. OpenAI receives up to 24 messages from this fictional sample group and generates 1–3 replies from the labelled demo cast. Replies appear with a typing indicator. This is session-only simulation; it never posts as real students or writes to real group chats. There is no scripted fallback for new messages. Failures show an error and Retry. The pre-filled conversation remains as clearly fictional history.
 
-The supplied key is stored only in `/private/tmp/myt-secrets/openai.env` (0600), outside this workspace, and is never bundled into the demo. Rotate any key pasted into a chat, then update that private file and restart the server. Temporary storage may be cleared on restart. `openai.env.example` contains placeholders only.
+The OpenAI key is not in the repo: judges receive `tools/openai.env` directly (copy `openai.env.example` to make your own). It is never bundled into the demo.
 
 The server binds only to loopback, checks Host and Origin, accepts bounded JSON, rejects unknown event IDs and non-cast authors, limits requests to 20/minute with three in flight, times out upstream calls and sanitizes errors. It serves only the demo root; it cannot serve secret files. API calls can incur OpenAI charges.
 

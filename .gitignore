@@ -4,3 +4,6 @@
 *.tmp
 
 /ai-runtime/
+
+# OpenAI key is shared with judges directly
+tools/openai.env
