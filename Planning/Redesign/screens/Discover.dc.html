@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MYT discover</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#14111C}
+a{color:#D4FF4F}a:hover{color:#E8FF9E}
+.disp{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+.scroller{scrollbar-width:none}.scroller::-webkit-scrollbar{display:none}
+@keyframes rise{from{opacity:0;transform:translateY(22px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes ring{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes counter{to{transform:rotate(-360deg)}}
+@keyframes ticker{0%,18%{transform:translateY(0)}25%,43%{transform:translateY(-25%)}50%,68%{transform:translateY(-50%)}75%,93%{transform:translateY(-75%)}100%{transform:translateY(-75%)}}
+@keyframes blink{50%{opacity:0}}
+@keyframes shimmer{from{background-position:-200px 0}to{background-position:200px 0}}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(212,255,79,.55)}100%{box-shadow:0 0 0 8px rgba(212,255,79,0)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.rise{opacity:0;animation:rise .6s cubic-bezier(.2,.8,.2,1) forwards}
+.ring{position:absolute;inset:0;border-radius:50%;border:2px solid #D4FF4F;animation:ring 2s ease-out infinite}
+.orbit{animation:orbit 3.2s linear infinite}
+.counter{animation:counter 3.2s linear infinite}
+.sweep{animation:sweep 1.6s linear infinite}
+.ticker{animation:ticker 8s cubic-bezier(.7,0,.3,1) infinite}
+.caret{animation:blink 1s steps(1) infinite}
+.skel{background:linear-gradient(90deg,#241F31 0,#332C44 50%,#241F31 100%);background-size:400px 100%;animation:shimmer 1.2s linear infinite;border-radius:10px}
+.dots::after{content:'';animation:dots 1.4s steps(1) infinite}
+.livedot{animation:pulse 1.6s ease-out infinite}
+.card{transition:transform .2s cubic-bezier(.3,1.4,.5,1),border-color .2s}
+.card:hover{transform:translateY(-3px) rotate(-.4deg);border-color:#4A4160}
+.card:hover .tile{animation:wiggle .5s ease}
+.chip{transition:transform .15s}
+.chip:active{transform:scale(.92)}
+.go{transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.go:hover{transform:rotate(-12deg) scale(1.06)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;opacity:1!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #14111C; color: #F5F2FA; font-family: 'DM Sans', system-ui, sans-serif; display: flex; flex-direction: column">
+
+<div style="padding: 20px 22px 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div>
+<div style="font-size: 13px; color: #A9A1BC; font-weight: 600">Sat 24 Oct · London</div>
+<h1 class="disp" style="margin: 2px 0 0; font-size: 32px; font-weight: 800; letter-spacing: -1px">What's the move?</h1>
+</div>
+<a href="Main.dc.html" aria-label="Your profile" style="width: 44px; height: 44px; border-radius: 50%; background: #D4FF4F; color: #14111C; display: flex; align-items: center; justify-content: center; font-weight: 800; text-decoration: none">A</a>
+</div>
+
+<div style="position: relative; display: flex; align-items: center; gap: 10px; background: #1F1A2B; border: 2px solid {{ searchBorder }}; border-radius: 20px; padding: 6px 6px 6px 16px; transition: border-color .3s">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#A9A1BC" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14a7 7 0 0 0 0 14zM20 20l-4-4"></path></svg>
+<div style="position: relative; flex: 1; min-width: 0; height: 44px">
+<input aria-label="Search activities" value="{{ query }}" onChange="{{ onQuery }}" style="position: absolute; inset: 0; width: 100%; border: 0; outline: none; background: transparent; color: #F5F2FA; font: 500 16px 'DM Sans', sans-serif; padding: 0">
+<sc-if value="{{ showHint }}" hint-placeholder-val="{{ true }}">
+<div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; gap: 5px; color: #7E7694; font-size: 16px; overflow: hidden">
+<span>Try</span>
+<span style="height: 22px; overflow: hidden; display: inline-block">
+<span class="ticker" style="display: flex; flex-direction: column; color: #F5F2FA; font-weight: 600">
+<span style="height: 22px; line-height: 22px">"karting"</span>
+<span style="height: 22px; line-height: 22px">"cinema night"</span>
+<span style="height: 22px; line-height: 22px">"Arsenal"</span>
+<span style="height: 22px; line-height: 22px">"matcha walk"</span>
+</span>
+</span>
+<span class="caret" style="width: 2px; height: 20px; background: #D4FF4F"></span>
+</div>
+</sc-if>
+</div>
+<button type="button" class="go" onClick="{{ runSearch }}" aria-label="Search" style="width: 48px; height: 48px; border-radius: 15px; border: 0; background: #D4FF4F; color: #14111C; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</button>
+</div>
+
+<div class="scroller" role="group" aria-label="Filter by interest" style="display: flex; gap: 8px; overflow-x: auto; margin: 0 -22px; padding: 0 22px 2px">
+<sc-for list="{{ filters }}" as="f" hint-placeholder-count="5">
+<sc-if value="{{ f.selected }}" hint-placeholder-val="{{ false }}">
+<button type="button" aria-pressed="true" class="chip" onClick="{{ f.pick }}" style="flex: none; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 0; background: {{ f.color }}; color: #14111C; font: 700 14px 'DM Sans', sans-serif; cursor: pointer; display: inline-flex; align-items: center; gap: 6px">
+<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>{{ f.label }}</button>
+</sc-if>
+<sc-if value="{{ f.off }}" hint-placeholder-val="{{ true }}">
+<button type="button" aria-pressed="false" class="chip" onClick="{{ f.pick }}" style="flex: none; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #352E47; background: #1F1A2B; color: #F5F2FA; font: 600 14px 'DM Sans', sans-serif; cursor: pointer; display: inline-flex; align-items: center; gap: 7px">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: {{ f.color }}"></span>{{ f.label }}</button>
+</sc-if>
+</sc-for>
+</div>
+</div>
+
+<div class="scroller" style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px 22px 110px">
+
+<sc-if value="{{ isSearching }}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display: flex; flex-direction: column; align-items: center; gap: 18px; padding-top: 20px">
+<div aria-hidden="true" style="position: relative; width: 170px; height: 170px">
+<span class="ring"></span>
+<span class="ring" style="animation-delay: .66s"></span>
+<span class="ring" style="animation-delay: 1.33s"></span>
+<div class="sweep" style="position: absolute; inset: 18px; border-radius: 50%; border: 1px solid #352E47; overflow: hidden">
+<div style="position: absolute; left: 50%; top: 0; width: 50%; height: 50%; background: linear-gradient(135deg, rgba(212,255,79,.35), rgba(212,255,79,0) 70%); transform-origin: 0 100%"></div>
+</div>
+<div class="orbit" style="position: absolute; inset: 6px">
+<span class="counter" style="position: absolute; left: 50%; top: -6px; margin-left: -12px; width: 24px; height: 24px; border-radius: 50%; background: #6EA8FF; display: block"></span>
+<span class="counter" style="position: absolute; right: -4px; top: 60%; width: 18px; height: 18px; border-radius: 50%; background: #FF9A4D; display: block"></span>
+<span class="counter" style="position: absolute; left: 4px; bottom: 6px; width: 20px; height: 20px; border-radius: 50%; background: #C79BFF; display: block"></span>
+</div>
+<div style="position: absolute; left: 50%; top: 50%; width: 58px; height: 58px; margin: -29px 0 0 -29px; border-radius: 50%; background: #D4FF4F; color: #14111C; display: flex; align-items: center; justify-content: center">
+<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 18a7 7 0 1 0 0-14a7 7 0 0 0 0 14zM20 20l-4-4"></path></svg>
+</div>
+</div>
+<div style="text-align: center">
+<div class="disp dots" style="font-size: 20px; font-weight: 700">Scanning London for your crowd</div>
+<div style="font-size: 14px; color: #A9A1BC; margin-top: 4px">Matching plans to your free time</div>
+</div>
+<div aria-hidden="true" style="width: 100%; display: flex; flex-direction: column; gap: 12px; margin-top: 4px">
+<div style="background: #1F1A2B; border-radius: 22px; padding: 16px; display: flex; gap: 12px">
+<div class="skel" style="width: 56px; height: 56px; border-radius: 16px"></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 9px; padding-top: 4px"><div class="skel" style="height: 14px; width: 85%"></div><div class="skel" style="height: 12px; width: 55%"></div></div>
+</div>
+<div style="background: #1F1A2B; border-radius: 22px; padding: 16px; display: flex; gap: 12px; opacity: .6">
+<div class="skel" style="width: 56px; height: 56px; border-radius: 16px"></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 9px; padding-top: 4px"><div class="skel" style="height: 14px; width: 70%"></div><div class="skel" style="height: 12px; width: 40%"></div></div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isResults }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div class="rise" style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 700">{{ countLabel }}</h2>
+<span style="font-size: 13px; color: #A9A1BC">Sorted by best fit</span>
+</div>
+
+<sc-for list="{{ cards }}" as="c" hint-placeholder-count="4">
+<a href="Activity.dc.html" class="card rise" style="animation-delay: {{ c.delay }}; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: #F5F2FA; background: #1F1A2B; border: 1.5px solid #2A2439; border-radius: 22px; padding: 14px">
+<div style="display: flex; gap: 12px">
+<div class="tile" style="flex: none; width: 56px; height: 56px; border-radius: 16px; background: {{ c.color }}; color: #14111C; display: flex; align-items: center; justify-content: center">
+<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ c.icon }}"></path></svg>
+</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 16px; font-weight: 700; line-height: 1.25">{{ c.title }}</div>
+<div style="font-size: 13px; color: #A9A1BC">{{ c.when }} · {{ c.area }}</div>
+</div>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<div style="display: flex; align-items: center; gap: 8px">
+<div style="display: flex">
+<sc-for list="{{ c.faces }}" as="p" hint-placeholder-count="3">
+<span style="width: 26px; height: 26px; margin-right: -7px; border-radius: 50%; border: 2px solid #1F1A2B; background: {{ p.bg }}; color: #14111C; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{ p.i }}</span>
+</sc-for>
+</div>
+<span style="font-size: 13px; font-weight: 600; margin-left: 6px">{{ c.going }}</span>
+</div>
+<span style="font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; border: 1.5px solid {{ c.badgeColor }}; color: {{ c.badgeColor }}">{{ c.badge }}</span>
+</div>
+<sc-if value="{{ c.live }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #A9A1BC; border-top: 1px solid #2A2439; padding-top: 10px">
+<span class="livedot" style="width: 8px; height: 8px; border-radius: 50%; background: #D4FF4F"></span>{{ c.liveText }}</div>
+</sc-if>
+</a>
+</sc-for>
+
+<sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+<div class="rise" style="text-align: center; padding: 30px 10px; background: #1F1A2B; border-radius: 22px">
+<div class="disp" style="font-size: 20px; font-weight: 700">Nothing matches yet</div>
+<p style="margin: 6px 0 14px; color: #A9A1BC; font-size: 14px">Try another word or open up your interests.</p>
+<button type="button" onClick="{{ reset }}" style="min-height: 44px; padding: 0 18px; border-radius: 14px; border: 0; background: #D4FF4F; color: #14111C; font: 700 15px 'DM Sans', sans-serif; cursor: pointer">Show everything</button>
+</div>
+</sc-if>
+</div>
+</sc-if>
+</div>
+
+<nav aria-label="Main" style="position: absolute; left: 16px; right: 16px; bottom: 18px; height: 66px; box-sizing: border-box; padding: 6px; border-radius: 24px; background: rgba(31,26,43,.94); border: 1px solid #352E47; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px">
+<a href="Discover.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 18px; background: #D4FF4F; color: #14111C; text-decoration: none; font-size: 11px; font-weight: 800">
+<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18a9 9 0 0 0 0 18zM15.5 8.5l-2 5-5 2 2-5z"></path></svg>Discover</a>
+<a href="Meet.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 18px; color: #A9A1BC; text-decoration: none; font-size: 11px; font-weight: 700">
+<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM12 12a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5zM8.5 17a3.5 3.5 0 0 1 7 0"></path></svg>Meet</a>
+<a href="Chats.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 18px; color: #A9A1BC; text-decoration: none; font-size: 11px; font-weight: 700">
+<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>Chats
+<span style="position: absolute; top: 4px; right: 18px; min-width: 16px; height: 16px; border-radius: 999px; background: #FF6FA8; color: #14111C; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center">5</span></a>
+<a href="Plans.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 18px; color: #A9A1BC; text-decoration: none; font-size: 11px; font-weight: 700">
+<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"></path></svg>Plans</a>
+</nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { query: '', filter: 'all', phase: 'searching' };
+  }
+  componentDidMount() { this.search(); }
+  componentWillUnmount() { clearTimeout(this.timer); }
+  search() {
+    var self = this;
+    clearTimeout(this.timer);
+    this.setState({ phase: 'searching' });
+    this.timer = setTimeout(function () { self.setState({ phase: 'results' }); }, 1900);
+  }
+  renderVals() {
+    var self = this;
+    var icons = {
+      football: 'M21 12a9 9 0 1 1-18 0a9 9 0 0 1 18 0zM12 7.5l4 2.9-1.5 4.6h-5L8 10.4z',
+      karting: 'M5 21V4M5 4h12l-2 4 2 4H5',
+      cinema: 'M4 6h16v12H4zM8 6v12M16 6v12M4 10h4M4 14h4M16 10h4M16 14h4',
+      music: 'M9 18V5l11-2v13M9 18a3 3 0 1 1-6 0a3 3 0 0 1 6 0zM20 16a3 3 0 1 1-6 0a3 3 0 0 1 6 0z',
+      social: 'M16 20v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 11a4 4 0 1 0 0-8a4 4 0 0 0 0 8zM22 20v-1a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'
+    };
+    var colors = { all: '#F5F2FA', football: '#6EA8FF', karting: '#FF9A4D', cinema: '#C79BFF', music: '#FF6FA8', social: '#4FE3C1' };
+    var filterDefs = [
+      { id: 'all', label: 'For you' }, { id: 'football', label: 'Football' }, { id: 'karting', label: 'Karting' },
+      { id: 'cinema', label: 'Cinema' }, { id: 'music', label: 'Gigs' }, { id: 'social', label: 'Socials' }
+    ];
+    var filters = filterDefs.map(function (f) {
+      var on = self.state.filter === f.id;
+      return { label: f.label, color: f.id === 'all' ? '#D4FF4F' : colors[f.id], selected: on, off: !on,
+        pick: function () { self.setState({ filter: f.id }); self.search(); } };
+    });
+    var faces = {
+      a: [{ i: 'MR', bg: '#6EA8FF' }, { i: 'EB', bg: '#4FE3C1' }, { i: 'AO', bg: '#FFD24F' }],
+      b: [{ i: 'LM', bg: '#FF9A4D' }, { i: 'NC', bg: '#C79BFF' }],
+      c: [{ i: 'PS', bg: '#C79BFF' }, { i: 'AO', bg: '#FFD24F' }, { i: 'MR', bg: '#6EA8FF' }],
+      d: [{ i: 'SK', bg: '#FF6FA8' }]
+    };
+    var all = [
+      { id: 'football', title: 'Watch Arsenal Women v London City Lionesses', when: 'Sun 15 Nov, 16:30', area: 'Holloway', going: '4 interested', badge: 'Verified', faces: faces.a, live: true, liveText: '2 people looking now' },
+      { id: 'karting', title: 'Try indoor karting in East London', when: 'Sat 7 Nov, 14:00', area: 'East London', going: '3 interested', badge: 'Group idea', faces: faces.b, live: true, liveText: 'Leo voted for Saturday' },
+      { id: 'cinema', title: 'Plan an East London cinema night', when: 'Fri 13 Nov, 19:30', area: 'East London', going: '5 interested', badge: 'Group idea', faces: faces.c, live: false },
+      { id: 'social', title: 'Matcha & Walk 2.0', when: 'Sun 25 Oct, 14:00', area: 'London', going: '1 interested', badge: 'Check listing', faces: faces.d, live: false },
+      { id: 'music', title: 'WAH Drumsheds 2026', when: 'Sat 7 Nov, 12:00', area: 'Drumsheds', going: '2 interested', badge: 'Check listing', faces: faces.b, live: false },
+      { id: 'football', title: 'Watch Tottenham Hotspur v Ipswich Town', when: 'Sat 21 Nov, 15:00', area: 'Tottenham', going: '3 interested', badge: 'Verified', faces: faces.c, live: false }
+    ];
+    var q = this.state.query.trim().toLowerCase();
+    var f = this.state.filter;
+    var cards = all.filter(function (c) {
+      return (f === 'all' || c.id === f) && (!q || (c.title + ' ' + c.id + ' ' + c.area).toLowerCase().indexOf(q) !== -1);
+    }).map(function (c, n) {
+      return Object.assign({}, c, {
+        icon: icons[c.id], color: colors[c.id], delay: (n * 0.09 + 0.1).toFixed(2) + 's',
+        badgeColor: c.badge === 'Verified' ? '#D4FF4F' : c.badge === 'Group idea' ? '#C9C2D9' : '#FFD24F'
+      });
+    });
+    var searching = this.state.phase === 'searching';
+    return {
+      query: this.state.query,
+      showHint: !this.state.query,
+      searchBorder: searching ? '#D4FF4F' : '#2A2439',
+      onQuery: function (e) { self.setState({ query: e.target.value }); },
+      runSearch: function () { self.search(); },
+      reset: function () { self.setState({ query: '', filter: 'all' }); self.search(); },
+      filters: filters,
+      isSearching: searching,
+      isResults: !searching,
+      cards: cards,
+      isEmpty: cards.length === 0,
+      countLabel: cards.length === 1 ? '1 plan near you' : cards.length + ' plans near you'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "manifestVersion": "2.4",
+  "id": "myt-student-plans",
+  "name": "MYT",
+  "version": "0.1.0",
+  "dependencies": { "react": "19.2.0", "react-dom": "19.2.0" },
+  "permissions": ["files.read", "files.write", "multiplayer"],
+  "contributes": {
+    "home": { "entry": "src/home.tsx", "title": "MYT" }
+  }
+}

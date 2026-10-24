@@ -1,0 +1,179 @@
+// MYT end-to-end flow check (S1). NOT part of the app: the app has no test runner.
+// Exercises the real repository, T1 decoder, T3 paths and C2 parser against an in-memory file port
+// that mimics the platform (missing folder list rejects; overwrite:false rejects on an existing file).
+// It cannot test the UI, real file sync, or presence.
+//
+// Run from any scratch folder (not the library), using any TypeScript 5 you already have:
+//   1. tsconfig.json: { "compilerOptions": { "target":"es2022","module":"commonjs","moduleResolution":"node",
+//        "lib":["es2022","dom"],"strict":true,"skipLibCheck":true,"types":[],"outDir":"out",
+//        "rootDir":"<library>/MYT/code/src" },
+//        "files":["<library>/MYT/code/src/qa/domain-checks.ts","<library>/MYT/code/src/wiring/appRepository.ts"] }
+//   2. node <path-to>/typescript/bin/tsc -p tsconfig.json
+//   3. save this file as e2e.cjs next to ./out, set SEED below to the library's MYT/data/ path, then: node e2e.cjs
+// G8's suite runs the same way: require("./out/qa/domain-checks.js").runChecks().
+// Last result (S1, 24 Oct 2026): G8 15 of 15 pass; this script 38 of 38 pass.
+const fs = require("fs");
+const { createAppRepository } = require("./out/wiring/appRepository.js");
+const SEED = "/path/to/Lightfern/MYT/data/";
+
+function makePort() {
+  const files = new Map();
+  const enoent = (p) => Object.assign(new Error(`ENOENT: no such file or directory, scandir '${p}'`), { code: "ENOENT" });
+  return {
+    files,
+    async readText(p) { if (!files.has(p)) throw enoent(p); return files.get(p); },
+    async writeText(p, t, o) { if (files.has(p) && !o.overwrite) throw new Error("EEXIST: " + p); files.set(p, t); },
+    async list(p) {
+      const prefix = p === "" ? "" : p + "/";
+      const out = new Map();
+      for (const k of files.keys()) if (k.startsWith(prefix)) {
+        const rest = k.slice(prefix.length); const name = rest.split("/")[0];
+        out.set(name, { path: prefix + name, name, kind: rest.includes("/") ? "folder" : "file" });
+      }
+      if (out.size === 0 && p !== "" && p !== "data") throw enoent(p);
+      return [...out.values()];
+    },
+    watch() { return () => {}; },
+  };
+}
+
+let pass = 0, fail = 0;
+const check = (name, ok, detail = "") => { ok ? pass++ : fail++; console.log((ok ? "PASS " : "FAIL ") + name + (detail ? `  [${detail}]` : "")); };
+const note = (name, detail) => console.log("OBSERVED " + name + "  [" + detail + "]");
+const ok = (r) => r && r.ok === true;
+
+(async () => {
+  const port = makePort();
+  for (const f of ["activities.json", "sample-profiles.json", "session.json"]) port.files.set("data/" + f, fs.readFileSync(SEED + f, "utf8"));
+  // Deterministic fixtures live only in this in-memory port. The shared catalog may refresh independently.
+  const liveCatalog = JSON.parse(port.files.get("data/activities.json"));
+  const fixture = {schemaVersion:1,id:"qa-future-football",title:"QA football",description:"Isolated QA fixture",interestId:"football",area:"London",status:"available",timeOptions:[{id:"qa-slot",startAt:"2100-11-15T16:30:00Z",endAt:null,availabilityKeys:["weekend-day"]}],cost:{amountPence:0,currency:"GBP",isEstimate:false},source:{kind:"demo",url:null,checkedAt:null}};
+  liveCatalog.items.push(fixture,{...fixture,id:"qa-write-failure"});
+  const seedCatalog=JSON.stringify(liveCatalog); port.files.set("data/activities.json",seedCatalog);
+  const A = { id: "3b92dba8-979c-467d-935f-318296862c4d", name: "Ada" };
+  const B = { id: "b1111111-2222-4333-8444-555555555555", name: "Ben" };
+  const repoA = createAppRepository(port, A), repoB = createAppRepository(port, B), anon = createAppRepository(port, null);
+  const ACT = "qa-future-football";
+  const cat = await repoA.loadActivities();
+  check("catalog loads through the adapter", ok(cat) && cat.value.value.items.length >= 6 && cat.value.value.items.some((a) => a.id === ACT));
+  const act = cat.value.value.items.find((a) => a.id === ACT);
+  const optionId = act.timeOptions[0].id;
+
+  const empty = await repoA.loadInterests(ACT);
+  check("fresh install: interests load as empty, not an error", ok(empty) && empty.value.value.length === 0, empty.ok ? "" : empty.error.message);
+  check("fresh install: votes, attendance, plans, profiles load as empty",
+    ok(await repoA.loadVotes(ACT)) && ok(await repoA.loadAttendance("plan:" + ACT)) && ok(await repoA.loadPlans()) && ok(await repoA.loadRealProfiles()));
+
+  const input = (n, u) => ({ displayName: n, university: u, interestIds: ["football"], availability: ["weekend-day"], budgetPence: null });
+  check("A saves a profile", ok(await repoA.saveProfile(input("Ada", "UCL"))));
+  check("B saves a profile", ok(await repoB.saveProfile(input("Ben", "KCL"))));
+  const mine = await repoA.loadMyProfile();
+  check("A reads back own profile", ok(mine) && mine.value.value?.displayName === "Ada");
+  const all = await repoA.loadRealProfiles();
+  check("both profiles visible to A", ok(all) && Object.keys(all.value.value).length === 2);
+  check("signed-out writes refused", (await anon.setInterest(ACT, "interested")).ok === false && (await anon.saveProfile(input("X", ""))).ok === false);
+
+  const s0 = await repoA.loadSession();
+  check("session seeded with no organiser", ok(s0) && s0.value.value.organiserUserId === null);
+  check("A claims organiser", ok(await repoA.claimOrganiser({ replace: false })));
+  const b1 = await repoB.claimOrganiser({ replace: false });
+  check("B cannot silently take over (replace:false)", b1.ok === false, b1.ok ? "" : b1.error.code);
+  check("organiser is A", (await repoB.loadSession()).value.value.organiserUserId === A.id);
+
+  check("A joins", ok(await repoA.setInterest(ACT, "interested")));
+  const i1 = await repoB.loadInterests(ACT);
+  check("B sees A's interest", ok(i1) && i1.value.value.length === 1 && i1.value.value[0].userId === A.id);
+
+  const early = await repoA.confirmPlan({ activityId: ACT, optionId, meetingPoint: "Arsenal station main entrance" });
+  check("confirm refused with one interested person", early.ok === false, early.ok ? "" : early.error.code + ": " + early.error.message);
+  check("B joins", ok(await repoB.setInterest(ACT, "interested")));
+  check("both interests visible", (await repoA.loadInterests(ACT)).value.value.length === 2);
+
+  check("A votes", ok(await repoA.setVote(ACT, optionId)));
+  check("B votes then clears", ok(await repoB.setVote(ACT, optionId)) && ok(await repoB.setVote(ACT, null)));
+  const bad = await repoA.setVote(ACT, "no-such-option");
+  note("vote for an option that does not exist", bad.ok ? "ACCEPTED (stored)" : "refused: " + bad.error.code);
+
+  const byB = await repoB.confirmPlan({ activityId: ACT, optionId, meetingPoint: "Arsenal station main entrance" });
+  check("non-organiser cannot confirm", byB.ok === false, byB.ok ? "" : byB.error.code + ": " + byB.error.message);
+  check("confirm refused for blank meeting point", (await repoA.confirmPlan({ activityId: ACT, optionId, meetingPoint: "   " })).ok === false);
+  check("confirm refused for unknown option", (await repoA.confirmPlan({ activityId: ACT, optionId: "nope", meetingPoint: "x" })).ok === false);
+  const made = await repoA.confirmPlan({ activityId: ACT, optionId, meetingPoint: "  Arsenal station main entrance " });
+  check("organiser confirms: created", made.ok && made.kind === "created", made.ok ? "" : made.error.message);
+  check("saved plan has trimmed point and the option's times", made.ok && made.plan.meetingPoint === "Arsenal station main entrance" && made.plan.startAt === act.timeOptions[0].startAt && made.plan.id === "plan:" + ACT);
+  const again = await repoA.confirmPlan({ activityId: ACT, optionId, meetingPoint: "Arsenal station main entrance" });
+  check("same confirmation again returns the existing plan", again.ok && again.kind === "existing");
+  const diff = await repoA.confirmPlan({ activityId: ACT, optionId, meetingPoint: "Somewhere else" });
+  check("a different confirmation cannot replace it", diff.ok === false, diff.ok ? "" : diff.error.code);
+  check("exactly one plan file", [...port.files.keys()].filter((k) => k.startsWith("data/plans/")).length === 1);
+  const plans = await repoB.loadPlans();
+  check("B loads the plan", ok(plans) && Object.keys(plans.value.value).length === 1);
+
+  const wd = await repoB.setInterest(ACT, "withdrawn");
+  note("withdraw after a plan exists", wd.ok ? "ACCEPTED by repository (UI locks it)" : "refused: " + wd.error.code);
+
+  const planId = "plan:" + ACT;
+  check("A marks going", ok(await repoA.setAttendance(planId, "going")));
+  check("B declines", ok(await repoB.setAttendance(planId, "declined")));
+  const att = await repoA.loadAttendance(planId);
+  check("attendance has one record per person", ok(att) && att.value.value.length === 2);
+  check("attendance for a missing plan refused", (await repoA.setAttendance("plan:nope", "going")).ok === false);
+
+  const keys = [...port.files.keys()];
+  const hex = (s) => "id-" + Buffer.from(s, "utf8").toString("hex");
+  check("participant files are keyed only by the two real user ids",
+    keys.filter((k) => /^data\/(interests|votes|attendance)\//.test(k)).every((k) => k.endsWith(hex(A.id) + ".json") || k.endsWith(hex(B.id) + ".json")));
+  check("no data written for sample or preview ids", !keys.some((k) => k.includes(Buffer.from("sample:", "utf8").toString("hex"))));
+  check("runtime records are compact JSON", keys.filter((k) => k.startsWith("data/interests/")).every((k) => !port.files.get(k).includes("\n")));
+
+  const folder = [...port.files.keys()].find((k) => k.startsWith("data/interests/")).split("/").slice(0, 3).join("/");
+  port.files.set(folder + "/" + hex("corrupt-user") + ".json", "{not json");
+  const withBad = await repoA.loadInterests(ACT);
+  check("a corrupt participant file becomes an issue; valid ones still load", ok(withBad) && withBad.value.value.length === 2 && withBad.value.issues.length === 1);
+  port.files.set("data/activities.json", JSON.stringify({ schemaVersion: 1, items: [{ id: "x" }] }));
+  const badCat = await repoA.loadActivities();
+  check("a corrupt catalog is an error, not an empty library", badCat.ok === false, badCat.ok ? "" : badCat.error.code);
+
+  // Restore the catalog so the write itself is what fails, and use an activity with no plan.
+  port.files.set("data/activities.json", seedCatalog);
+  const failing = { ...port, async writeText() { throw new Error("disk full"); } };
+  const fw = await createAppRepository(failing, A).setInterest("qa-write-failure", "interested");
+  check("a rejected write reports an io error, never success", fw.ok === false && fw.error.code === "io", fw.ok ? "" : fw.error.code);
+
+  const { createSocialRepository } = require("./out/data/socialRepository.js");
+  const { groupMembers, dmId } = require("./out/domain/social.js");
+  const socialA = createSocialRepository(port,A,repoA), socialB = createSocialRepository(port,B,repoB);
+  check("friend request A to B",ok(await socialA.request(B.id,"pending")));
+  check("B receives request",(await socialB.load()).value.value.requests.some(r=>r.fromId===A.id&&r.toId===B.id));
+  check("B accepts request",ok(await socialB.respond(A.id,"accepted")));
+  const dm = dmId(A.id,B.id);
+  check("friends can post a DM",ok(await socialA.post(dm,{kind:"text",text:" Hello Ben "})));
+  check("B reads trimmed DM",(await socialB.load()).value.value.messages.some(m=>m.chatId===dm&&m.text==="Hello Ben"));
+  check("B marks chat read",ok(await socialB.read(dm)));
+  const group = "group:"+ACT;
+  check("joining activity yields group membership",groupMembers(ACT,(await repoA.loadInterests(ACT)).value.value).includes(A.id));
+  const poll = {question:"Which day?",options:[{id:"fri",label:"Friday"},{id:"sat",label:"Saturday"}],multi:false,anonymous:true};
+  check("group member posts poll",ok(await socialA.post(group,{kind:"poll",poll})));
+  const pollMessage=(await socialB.load()).value.value.messages.find(m=>m.kind==="poll");
+  check("other group member votes",ok(await socialB.vote(group,pollMessage.id,["fri"])));
+  check("voter changes choice",ok(await socialB.vote(group,pollMessage.id,["sat"])));
+  check("changed vote has only new choice",(await socialA.load()).value.value.votes.find(v=>v.messageId===pollMessage.id).optionIds.join()==="sat");
+  check("voter clears choice",ok(await socialB.vote(group,pollMessage.id,[])));
+  check("single choice rejects multiple choices",!(await socialB.vote(group,pollMessage.id,["fri","sat"])).ok);
+  check("poll rejects unknown options",!(await socialB.vote(group,pollMessage.id,["nope"])).ok);
+  check("sample can't be friended",!(await socialA.request("sample:maya","pending")).ok);
+  check("signed out can't post",!(await createSocialRepository(port,null,anon).post(group,{kind:"text",text:"Hi"})).ok);
+  const outsider={id:"outsider",name:"Outsider"};
+  const outsiderSocial=createSocialRepository(port,outsider,createAppRepository(port,outsider));
+  check("nonmember cannot post group",!(await outsiderSocial.post(group,{kind:"text",text:"Hi"})).ok);
+  check("nonmember load excludes chat messages",(await outsiderSocial.load()).value.value.messages.length===0);
+  check("author only writes own message path",[...port.files.keys()].filter(p=>p.includes("/messages/")).every(p=>p.includes(hex(A.id))));
+  check("block persists for current user",ok(await socialA.block(B.id,true))&&(await socialA.load()).value.value.blockedIds.includes(B.id));
+  check("blocking hides DM for blocker",!(await socialA.load()).value.value.messages.some(m=>m.chatId===dm));
+  check("blocker cannot post DM",!(await socialA.post(dm,{kind:"text",text:"Hi"})).ok);
+  check("unblock restores DM",ok(await socialA.block(B.id,false))&&(await socialA.load()).value.value.messages.some(m=>m.chatId===dm));
+  check("cancel request removes DM eligibility",ok(await socialA.request(B.id,"cancelled"))&&!(await socialB.post(dm,{kind:"text",text:"Hi"})).ok);
+
+  console.log(`\n${pass} passed, ${fail} failed`);
+  process.exit(fail ? 1 : 0);
+})().catch((e) => { console.error("CRASH", e); process.exit(2); });

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MYT free time</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#14111C}
+a{color:#D4FF4F}a:hover{color:#E8FF9E}
+.disp{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+@keyframes fill{from{width:40%}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.7)}55%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes drop{from{opacity:0;transform:translateY(-14px) scale(.6)}to{opacity:1;transform:none}}
+@keyframes sun{to{transform:rotate(360deg)}}
+@keyframes twinkle{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+.fill{animation:fill .9s cubic-bezier(.3,1.3,.5,1) .2s both}
+.rise{opacity:0;animation:rise .5s cubic-bezier(.2,.8,.2,1) forwards}
+.cellOn{animation:pop .35s cubic-bezier(.3,1.6,.5,1)}
+.drop{opacity:0;animation:drop .45s cubic-bezier(.3,1.5,.5,1) forwards}
+.sun{animation:sun 10s linear infinite}
+.tw{animation:twinkle 2.4s ease-in-out infinite}
+.cell{transition:transform .12s}
+.cell:active{transform:scale(.88)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;opacity:1!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #14111C; color: #F5F2FA; font-family: 'DM Sans', system-ui, sans-serif; display: flex; flex-direction: column; padding: 20px 22px 26px">
+
+<div style="display: flex; align-items: center; gap: 12px">
+<a href="Onboard2.dc.html" aria-label="Back" style="width: 44px; height: 44px; margin-left: -10px; display: flex; align-items: center; justify-content: center; color: #F5F2FA">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg></a>
+<span style="font-size: 13px; font-weight: 700; color: #A9A1BC">3 of 5</span>
+<span style="flex: 1; height: 6px; border-radius: 999px; background: #2A2439; overflow: hidden"><span class="fill" style="display: block; height: 100%; width: 60%; background: #D4FF4F; border-radius: 999px"></span></span>
+</div>
+
+<h1 class="disp rise" style="margin: 14px 0 6px; font-size: 32px; line-height: 1.05; font-weight: 800; letter-spacing: -1px">When are you usually free?</h1>
+<p class="rise" style="margin: 0 0 18px; font-size: 15px; color: #A9A1BC; animation-delay: .05s">Tap the slots that work. We'll only suggest plans that fit.</p>
+
+<div class="rise" role="group" aria-label="Free time" style="animation-delay: .1s; background: #1F1A2B; border-radius: 24px; padding: 14px 12px">
+<div style="display: grid; grid-template-columns: 34px repeat(7, minmax(0, 1fr)); gap: 6px; align-items: center">
+<span></span>
+<sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+<span style="text-align: center; font-size: 12px; font-weight: 700; color: {{ d.color }}">{{ d.label }}</span>
+</sc-for>
+
+<span aria-hidden="true" style="display: flex; justify-content: center; color: #FFD24F">
+<svg class="sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 16a4 4 0 1 0 0-8a4 4 0 0 0 0 8zM12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></span>
+<sc-for list="{{ dayCells }}" as="c" hint-placeholder-count="7">
+<sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}">
+<button type="button" class="cell cellOn" aria-pressed="true" aria-label="{{ c.aria }}" onClick="{{ c.toggle }}" style="height: 54px; border-radius: 12px; border: 0; background: #FFD24F; cursor: pointer; padding: 0"></button>
+</sc-if>
+<sc-if value="{{ c.off }}" hint-placeholder-val="{{ true }}">
+<button type="button" class="cell" aria-pressed="false" aria-label="{{ c.aria }}" onClick="{{ c.toggle }}" style="height: 54px; border-radius: 12px; border: 1.5px dashed #4A4160; background: transparent; cursor: pointer; padding: 0"></button>
+</sc-if>
+</sc-for>
+
+<span aria-hidden="true" style="position: relative; display: flex; justify-content: center; color: #C79BFF">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg>
+<span class="tw" style="position: absolute; right: 2px; top: -4px; width: 4px; height: 4px; border-radius: 50%; background: #C79BFF"></span></span>
+<sc-for list="{{ nightCells }}" as="c" hint-placeholder-count="7">
+<sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}">
+<button type="button" class="cell cellOn" aria-pressed="true" aria-label="{{ c.aria }}" onClick="{{ c.toggle }}" style="height: 54px; border-radius: 12px; border: 0; background: #C79BFF; cursor: pointer; padding: 0"></button>
+</sc-if>
+<sc-if value="{{ c.off }}" hint-placeholder-val="{{ true }}">
+<button type="button" class="cell" aria-pressed="false" aria-label="{{ c.aria }}" onClick="{{ c.toggle }}" style="height: 54px; border-radius: 12px; border: 1.5px dashed #4A4160; background: transparent; cursor: pointer; padding: 0"></button>
+</sc-if>
+</sc-for>
+</div>
+<div style="display: flex; gap: 16px; margin-top: 12px; padding-left: 4px; font-size: 12px; color: #A9A1BC">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #FFD24F"></span>Daytime</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #C79BFF"></span>Evening</span>
+<span style="margin-left: auto; font-weight: 700; color: #F5F2FA">{{ total }} slots</span>
+</div>
+</div>
+
+<fieldset class="rise" style="animation-delay: .2s; border: 0; margin: 20px 0 0; padding: 0; min-width: 0">
+<legend style="padding: 0; margin-bottom: 10px; font-size: 13px; font-weight: 700; color: #A9A1BC; text-transform: uppercase; letter-spacing: 1px">Usual spend per plan</legend>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{ budgets }}" as="b" hint-placeholder-count="4">
+<sc-if value="{{ b.on }}" hint-placeholder-val="{{ false }}">
+<button type="button" aria-pressed="true" onClick="{{ b.pick }}" class="drop" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 0; background: #4FE3C1; color: #14111C; font: 700 14px 'DM Sans', sans-serif; cursor: pointer">{{ b.label }}</button>
+</sc-if>
+<sc-if value="{{ b.off }}" hint-placeholder-val="{{ true }}">
+<button type="button" aria-pressed="false" onClick="{{ b.pick }}" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid #352E47; background: transparent; color: #F5F2FA; font: 600 14px 'DM Sans', sans-serif; cursor: pointer">{{ b.label }}</button>
+</sc-if>
+</sc-for>
+</div>
+</fieldset>
+
+<a href="Main.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 58px; border-radius: 20px; background: #D4FF4F; color: #14111C; text-decoration: none; font-weight: 800; font-size: 17px; box-shadow: 0 6px 0 #8FB32A">
+<span class="disp">Next: what you're into</span>
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</a>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { slots: { 'd5': true, 'd6': true, 'n2': true, 'n4': true, 'n5': true }, budget: 'u15' };
+  }
+  renderVals() {
+    var self = this;
+    var names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    var short = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    var slots = this.state.slots;
+    function cells(prefix, part) {
+      return names.map(function (n, i) {
+        var key = prefix + i;
+        var on = !!slots[key];
+        return {
+          on: on, off: !on, aria: n + ' ' + part,
+          toggle: function () {
+            var next = Object.assign({}, self.state.slots);
+            next[key] = !on;
+            self.setState({ slots: next });
+          }
+        };
+      });
+    }
+    var total = Object.keys(slots).filter(function (k) { return slots[k]; }).length;
+    var budgets = [{ id: 'free', label: 'Free only' }, { id: 'u15', label: 'Under £15' }, { id: 'u30', label: 'Under £30' }, { id: 'any', label: 'Depends' }].map(function (b) {
+      var on = self.state.budget === b.id;
+      return { label: b.label, on: on, off: !on, pick: function () { self.setState({ budget: b.id }); } };
+    });
+    return {
+      days: short.map(function (s, i) { return { label: s, color: i >= 5 ? '#D4FF4F' : '#A9A1BC' }; }),
+      dayCells: cells('d', 'daytime'),
+      nightCells: cells('n', 'evening'),
+      total: total,
+      budgets: budgets
+    };
+  }
+}
+</script>
+</body>
+</html>

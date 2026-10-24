@@ -1,0 +1,38 @@
+import type { ChatPoll, FriendRequest, FriendResponse, PollVote, ChatMessage, InterestRecord } from "../types";
+import { areFriends, dmId, groupMembers, pollTally, togglePollVote, unreadCount, validPoll } from "../domain/social";
+import { isChatPoll, isSocialRecord } from "../domain/validation";
+import { availabilityFromSlots } from "../domain/preferences";
+export function runSocialChecks() {
+ const checks:{name:string;passed:boolean}[]=[];const test=(name:string,passed:boolean)=>checks.push({name,passed});
+ const time="2026-10-24T10:00:00Z", later="2026-10-24T11:00:00Z";
+ const r:FriendRequest={schemaVersion:1,fromId:"a",toId:"b",status:"pending",createdAt:time};
+ const response:FriendResponse={schemaVersion:1,fromId:"a",toId:"b",status:"accepted",respondedAt:later};
+ test("request alone isn't friendship",!areFriends("a","b",[r],[]));
+ test("acceptance grants friendship in both directions",areFriends("a","b",[r],[response])&&areFriends("b","a",[r],[response]));
+ test("decline isn't friendship",!areFriends("a","b",[r],[{...response,status:"declined"}]));
+ test("undo restores pending",!areFriends("a","b",[r],[{...response,status:"undone"}]));
+ test("cancel removes friendship",!areFriends("a","b",[{...r,status:"cancelled"}],[response]));
+ test("old acceptance cannot accept a new request",!areFriends("a","b",[{...r,createdAt:"2026-10-25T00:00:00Z"}],[response]));
+ test("DM ids are canonical",dmId("b","a")==="dm:a|b");
+ let invalid=false;try{dmId("sample:a","b");}catch{invalid=true;}test("sample cannot form DM",invalid);
+ const i:InterestRecord={schemaVersion:1,activityId:"football",userId:"a",status:"interested",updatedAt:time};
+ test("membership deduplicates and excludes samples",groupMembers("football",[i,i,{...i,userId:"sample:x"}]).join()==="a");
+ test("withdrawal removes group member",groupMembers("football",[i,{...i,status:"withdrawn",updatedAt:later}]).length===0);
+ const poll:ChatPoll={question:"When?",options:[{id:"one",label:"Friday"},{id:"two",label:"Saturday"}],multi:false,anonymous:false};
+ test("valid poll",validPoll(poll)&&isChatPoll(poll));
+ test("blank question rejected",!validPoll({...poll,question:" "}));test("duplicate options rejected",!validPoll({...poll,options:[poll.options[0],poll.options[0]]}));
+ test("too few options rejected",!validPoll({...poll,options:[poll.options[0]]}));test("long question rejected",!validPoll({...poll,question:"x".repeat(81)}));
+ test("untrusted poll rejected",!isChatPoll({question:"When?",options:[null],multi:true,anonymous:true}));
+ test("single choice replaces",togglePollVote(poll,["one"],"two").join()==="two");test("single choice clears",togglePollVote(poll,["one"],"one").length===0);
+ test("multi choice toggles",togglePollVote({...poll,multi:true},["one"],"two").length===2&&togglePollVote({...poll,multi:true},["one","two"],"one").join()==="two");
+ const vote:PollVote={schemaVersion:1,chatId:"group:football",messageId:"m",voterId:"a",optionIds:["one"],updatedAt:time};
+ test("tally counts people",pollTally(poll,[vote]).options[0].percent===100);
+ test("clearing vote removes person",pollTally(poll,[vote,{...vote,optionIds:[],updatedAt:later}]).voters===0);
+ test("anonymous totals match named totals",JSON.stringify(pollTally(poll,[vote]))===JSON.stringify(pollTally({...poll,anonymous:true},[vote])));
+ test("invalid multi response ignored for single poll",pollTally(poll,[{...vote,optionIds:["one","two"]}]).voters===0);
+ const m:ChatMessage={schemaVersion:1,id:"m",chatId:"group:football",authorId:"b",kind:"text",text:"Hi",createdAt:later};
+ test("unread excludes self and read messages",unreadCount([m,{...m,id:"n",authorId:"a"}],m.chatId,"a",time)===1&&unreadCount([m],m.chatId,"a",later)===0);
+ test("message length guard",!isSocialRecord("message",{...m,text:"x".repeat(1001)}));
+ test("rich free slots preserve matching",availabilityFromSlots(["mon-day","tue-eve","sat-day","sun-eve"]).length===3);
+ return checks;
+}

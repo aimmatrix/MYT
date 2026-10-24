@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MYT activity</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#14111C}
+a{color:#D4FF4F}a:hover{color:#E8FF9E}
+.disp{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+.scroller{scrollbar-width:none}.scroller::-webkit-scrollbar{display:none}
+@keyframes track{from{background-position:0 0}to{background-position:-64px 0}}
+@keyframes zoom{0%,100%{transform:translateX(-6px) rotate(-4deg)}50%{transform:translateX(6px) rotate(3deg)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-18px) scale(.8)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.6)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(212,255,79,.55)}100%{box-shadow:0 0 0 9px rgba(212,255,79,0)}}
+@keyframes speed{0%{transform:translateX(30px);opacity:0}30%{opacity:.8}100%{transform:translateX(-60px);opacity:0}}
+@keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--x),var(--y)) scale(.4);opacity:0}}
+.track{background-color:#FF9A4D;background-image:repeating-linear-gradient(90deg,rgba(20,17,28,.12) 0 16px,transparent 16px 32px);background-size:64px 100%;animation:track .9s linear infinite}
+.zoom{animation:zoom 1.6s ease-in-out infinite}
+.slide{opacity:0;animation:slideIn .5s cubic-bezier(.3,1.5,.5,1) forwards}
+.rise{opacity:0;animation:rise .6s cubic-bezier(.2,.8,.2,1) forwards}
+.pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.livedot{animation:pulse 1.6s ease-out infinite}
+.speed{position:absolute;height:3px;border-radius:2px;background:#14111C;opacity:0;animation:speed 1.1s linear infinite}
+.bar{transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+.opt{transition:transform .15s,border-color .2s,background .2s}
+.opt:active{transform:scale(.98)}
+.cta{transition:transform .15s,background .3s}
+.cta:active{transform:scale(.96)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;opacity:1!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #14111C; color: #F5F2FA; font-family: 'DM Sans', system-ui, sans-serif">
+
+<div class="scroller" style="position: absolute; inset: 0 0 96px; overflow-y: auto">
+
+<div class="track" style="position: relative; height: 230px; border-radius: 0 0 34px 34px; overflow: hidden">
+<div style="position: absolute; top: 16px; left: 16px; right: 16px; display: flex; justify-content: space-between">
+<a href="Discover.dc.html" aria-label="Back to Discover" style="width: 44px; height: 44px; border-radius: 14px; background: #14111C; color: #F5F2FA; display: flex; align-items: center; justify-content: center">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg></a>
+<button type="button" aria-label="Share" style="width: 44px; height: 44px; border-radius: 14px; border: 0; background: #14111C; color: #F5F2FA; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v7h14v-7"></path></svg></button>
+</div>
+<div aria-hidden="true" style="position: absolute; left: 50%; top: 92px; margin-left: -50px">
+<div class="zoom" style="position: relative; width: 100px; height: 100px; border-radius: 30px; background: #14111C; color: #FF9A4D; display: flex; align-items: center; justify-content: center">
+<svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h12l-2 4 2 4H5"></path></svg>
+</div>
+<span class="speed" style="left: 112px; top: 30px; width: 34px"></span>
+<span class="speed" style="left: 118px; top: 52px; width: 22px; animation-delay: .35s"></span>
+<span class="speed" style="left: 110px; top: 72px; width: 30px; animation-delay: .7s"></span>
+</div>
+<span style="position: absolute; right: 20px; bottom: 18px; transform: rotate(6deg); background: #F5F2FA; color: #14111C; font-weight: 800; font-size: 12px; padding: 7px 12px; border-radius: 999px; letter-spacing: .5px">GROUP IDEA</span>
+</div>
+
+<div style="padding: 20px 22px 0; display: flex; flex-direction: column; gap: 18px">
+<div class="rise">
+<h1 class="disp" style="margin: 0; font-size: 28px; line-height: 1.08; font-weight: 800; letter-spacing: -.8px">Try indoor karting in East London</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: 14px; color: #A9A1BC">
+<span style="display: flex; align-items: center; gap: 5px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#FF9A4D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12zM12 11.5a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5z"></path></svg>Venue to choose</span>
+<span style="display: flex; align-items: center; gap: 5px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#FF9A4D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"></path></svg>7 or 8 Nov</span>
+<span>Price not listed</span>
+</div>
+</div>
+
+<div class="rise" style="animation-delay: .1s; display: flex; align-items: center; gap: 10px; background: #1F1A2B; border-radius: 16px; padding: 12px 14px; font-size: 14px">
+<span class="livedot" style="flex: none; width: 9px; height: 9px; border-radius: 50%; background: #D4FF4F"></span>
+<span><strong>2 people</strong> are looking at this right now</span>
+</div>
+
+<section class="rise" style="animation-delay: .18s">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 class="disp" style="margin: 0 0 10px; font-size: 18px; font-weight: 700">Who's in</h2>
+<span style="font-size: 13px; color: #A9A1BC">{{ inCount }} interested</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{ people }}" as="p" hint-placeholder-count="3">
+<div class="slide" style="animation-delay: {{ p.delay }}; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 16px; background: {{ p.rowBg }}; border: 1.5px solid {{ p.rowBorder }}">
+<span style="flex: none; width: 40px; height: 40px; border-radius: 50%; background: {{ p.bg }}; color: #14111C; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center">{{ p.i }}</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<span style="font-weight: 700; font-size: 15px">{{ p.name }}</span>
+<span style="font-size: 13px; color: #A9A1BC">{{ p.uni }}</span>
+</span>
+<span style="font-size: 12px; font-weight: 700; color: {{ p.tagColor }}">{{ p.tag }}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<fieldset class="rise" style="animation-delay: .26s; border: 0; margin: 0; padding: 0; min-width: 0">
+<legend class="disp" style="padding: 0; margin-bottom: 4px; font-size: 18px; font-weight: 700">Pick a time</legend>
+<p style="margin: 0 0 10px; font-size: 13px; color: #A9A1BC">Votes help the organiser decide. They don't book anything.</p>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{ times }}" as="t" hint-placeholder-count="2">
+<label class="opt" style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 18px; cursor: pointer; background: {{ t.bg }}; border: 2px solid {{ t.border }}">
+<span style="display: flex; align-items: center; gap: 12px">
+<input type="radio" name="time" checked="{{ t.checked }}" onChange="{{ t.pick }}" style="width: 20px; height: 20px; margin: 0; accent-color: #D4FF4F">
+<span style="flex: 1; display: flex; flex-direction: column">
+<span style="font-weight: 700; font-size: 15px">{{ t.label }}</span>
+<span style="font-size: 13px; color: #A9A1BC">Weekend afternoon</span>
+</span>
+<span style="font-weight: 800; font-size: 15px">{{ t.votesLabel }}</span>
+</span>
+<span style="height: 8px; border-radius: 999px; background: #2A2439; overflow: hidden; display: block">
+<span class="bar" style="display: block; height: 100%; border-radius: 999px; width: {{ t.pct }}; background: {{ t.barColor }}"></span>
+</span>
+</label>
+</sc-for>
+</div>
+</fieldset>
+
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #A9A1BC; background: #1F1A2B; border-radius: 16px; padding: 12px 14px">This is a group idea, not a booking. Check a venue's prices and age rules before anyone pays.</p>
+</div>
+</div>
+
+<div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 22px 22px; background: #14111C; border-top: 1px solid #2A2439; display: flex; gap: 10px; align-items: center">
+<sc-if value="{{ joined }}" hint-placeholder-val="{{ false }}">
+<div style="position: relative; flex: 1">
+<button type="button" class="cta" onClick="{{ toggle }}" style="width: 100%; min-height: 56px; border-radius: 18px; border: 2px solid #D4FF4F; background: transparent; color: #D4FF4F; font: 800 17px 'Bricolage Grotesque', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer">
+<span class="pop" style="width: 26px; height: 26px; border-radius: 50%; background: #D4FF4F; color: #14111C; display: flex; align-items: center; justify-content: center">
+<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></span>You're in</button>
+<span aria-hidden="true" style="position: absolute; left: 50%; top: 50%; pointer-events: none">
+<span style="position: absolute; width: 8px; height: 8px; border-radius: 2px; background: #6EA8FF; --x: -90px; --y: -60px; animation: burst .8s ease-out forwards"></span>
+<span style="position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #FF9A4D; --x: 80px; --y: -70px; animation: burst .8s ease-out forwards"></span>
+<span style="position: absolute; width: 8px; height: 8px; border-radius: 2px; background: #C79BFF; --x: -40px; --y: -90px; animation: burst .9s ease-out forwards"></span>
+<span style="position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #FF6FA8; --x: 110px; --y: -30px; animation: burst .8s ease-out forwards"></span>
+<span style="position: absolute; width: 8px; height: 8px; border-radius: 2px; background: #4FE3C1; --x: 30px; --y: -100px; animation: burst .9s ease-out forwards"></span>
+<span style="position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #FFD24F; --x: -120px; --y: -20px; animation: burst .8s ease-out forwards"></span>
+</span>
+</div>
+</sc-if>
+<sc-if value="{{ notJoined }}" hint-placeholder-val="{{ true }}">
+<button type="button" class="cta" onClick="{{ toggle }}" style="flex: 1; min-height: 56px; border-radius: 18px; border: 0; background: #D4FF4F; color: #14111C; font: 800 17px 'Bricolage Grotesque', sans-serif; box-shadow: 0 6px 0 #8FB32A; cursor: pointer">I'm interested</button>
+</sc-if>
+<sc-if value="{{ joined }}" hint-placeholder-val="{{ false }}">
+<a href="GroupChat.dc.html" style="flex: none; min-height: 56px; padding: 0 16px; border-radius: 18px; background: #6EA8FF; color: #14111C; text-decoration: none; font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 6px"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>Group chat</a>
+</sc-if>
+<sc-if value="{{ notJoined }}" hint-placeholder-val="{{ true }}">
+<a href="Plans.dc.html" style="flex: none; min-height: 56px; padding: 0 16px; border-radius: 18px; background: #1F1A2B; color: #F5F2FA; text-decoration: none; font-weight: 700; font-size: 15px; display: flex; align-items: center">My plans</a>
+</sc-if>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { joined: false, vote: null };
+  }
+  renderVals() {
+    var self = this;
+    var joined = this.state.joined;
+    var people = [
+      { i: 'LM', name: 'Leo Mensah', uni: 'UCL', bg: '#FF9A4D', tag: 'Organiser', tagColor: '#FF9A4D' },
+      { i: 'NC', name: 'Noah Chen', uni: 'Imperial', bg: '#C79BFF', tag: '', tagColor: '#A9A1BC' },
+      { i: 'PS', name: 'Priya Shah', uni: 'Queen Mary', bg: '#4FE3C1', tag: '', tagColor: '#A9A1BC' }
+    ];
+    if (joined) people.push({ i: 'A', name: 'Ammad', uni: 'Middlesex', bg: '#D4FF4F', tag: 'You', tagColor: '#D4FF4F', me: true });
+    people = people.map(function (p, n) {
+      return Object.assign({}, p, {
+        delay: (n * 0.08 + 0.25).toFixed(2) + 's',
+        rowBg: p.me ? 'rgba(212,255,79,.08)' : '#1F1A2B',
+        rowBorder: p.me ? '#D4FF4F' : '#1F1A2B'
+      });
+    });
+    var base = [{ id: 'sat', label: 'Sat 7 Nov, 14:00', votes: 2 }, { id: 'sun', label: 'Sun 8 Nov, 14:00', votes: 1 }];
+    var withMine = base.map(function (t) { return Object.assign({}, t, { votes: t.votes + (self.state.vote === t.id ? 1 : 0) }); });
+    var max = Math.max.apply(null, withMine.map(function (t) { return t.votes; }).concat([1]));
+    var times = withMine.map(function (t) {
+      var mine = self.state.vote === t.id;
+      return {
+        label: t.label,
+        checked: mine,
+        votesLabel: t.votes === 1 ? '1 vote' : t.votes + ' votes',
+        pct: Math.round((t.votes / (max + 1)) * 100) + '%',
+        barColor: mine ? '#D4FF4F' : '#FF9A4D',
+        bg: mine ? 'rgba(212,255,79,.08)' : '#1F1A2B',
+        border: mine ? '#D4FF4F' : '#1F1A2B',
+        pick: function () { self.setState({ vote: t.id }); }
+      };
+    });
+    return {
+      people: people,
+      inCount: people.length,
+      times: times,
+      joined: joined,
+      notJoined: !joined,
+      toggle: function () { self.setState({ joined: !joined }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

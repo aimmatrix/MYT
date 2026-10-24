@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MYT sign up</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#14111C}
+a{color:#D4FF4F}a:hover{color:#E8FF9E}
+.disp{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+@keyframes letter{0%{opacity:0;transform:translateY(40px) rotate(12deg) scale(.6)}70%{transform:translateY(-6px) rotate(-3deg) scale(1.05)}100%{opacity:1;transform:none}}
+@keyframes ticker{0%,20%{transform:translateY(0)}25%,45%{transform:translateY(-20%)}50%,70%{transform:translateY(-40%)}75%,95%{transform:translateY(-60%)}100%{transform:translateY(-80%)}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes fill{from{width:0}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes counter{to{transform:rotate(-360deg)}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes shine{0%{transform:translateX(-140%) skewX(-20deg)}55%,100%{transform:translateX(420%) skewX(-20deg)}}
+.letter{display:inline-block;opacity:0;animation:letter .7s cubic-bezier(.3,1.4,.5,1) forwards}
+.ticker{animation:ticker 7s cubic-bezier(.7,0,.3,1) infinite}
+.rise{opacity:0;animation:rise .6s cubic-bezier(.2,.8,.2,1) forwards}
+.fill{animation:fill 1s cubic-bezier(.3,1.3,.5,1) .3s both}
+.orbit{animation:orbit 18s linear infinite}
+.counter{animation:counter 18s linear infinite}
+.ok{animation:rise .4s ease forwards}
+.field{transition:border-color .25s,box-shadow .25s}
+.field:focus-within{border-color:#D4FF4F;box-shadow:0 0 0 4px rgba(212,255,79,.15)}
+.shine{position:absolute;top:0;bottom:0;width:60px;background:rgba(255,255,255,.5);animation:shine 2.8s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;opacity:1!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #14111C; color: #F5F2FA; font-family: 'DM Sans', system-ui, sans-serif; display: flex; flex-direction: column; padding: 20px 22px 26px">
+
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="font-size: 13px; font-weight: 700; color: #A9A1BC">1 of 5</span>
+<span style="flex: 1; height: 6px; border-radius: 999px; background: #2A2439; overflow: hidden"><span class="fill" style="display: block; height: 100%; width: 20%; background: #D4FF4F; border-radius: 999px"></span></span>
+<a href="Main.dc.html" style="font-size: 14px; font-weight: 600; text-decoration: none; padding: 12px 0 12px 4px">I have an account</a>
+</div>
+
+<div aria-hidden="true" style="position: relative; height: 250px; margin-top: 6px">
+<div class="orbit" style="position: absolute; left: 50%; top: 50%; width: 230px; height: 230px; margin: -115px 0 0 -115px; border-radius: 50%; border: 1.5px dashed #352E47">
+<span class="counter" style="position: absolute; left: -16px; top: 92px; width: 36px; height: 36px; border-radius: 50%; background: #6EA8FF; color: #14111C; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center">MR</span>
+<span class="counter" style="position: absolute; right: -10px; top: 30px; width: 32px; height: 32px; border-radius: 50%; background: #FF9A4D; color: #14111C; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center">LM</span>
+<span class="counter" style="position: absolute; left: 140px; bottom: -14px; width: 34px; height: 34px; border-radius: 50%; background: #C79BFF; color: #14111C; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center">PS</span>
+<span class="counter" style="position: absolute; left: 34px; top: 4px; width: 26px; height: 26px; border-radius: 50%; background: #4FE3C1; color: #14111C; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center">NC</span>
+</div>
+<div class="disp" style="position: absolute; left: 0; right: 0; top: 78px; text-align: center; font-size: 88px; font-weight: 800; letter-spacing: -4px; line-height: 1">
+<span class="letter" style="animation-delay: .1s">m</span><span class="letter" style="animation-delay: .22s">y</span><span class="letter" style="animation-delay: .34s; color: #D4FF4F">t</span>
+</div>
+</div>
+
+<h1 class="disp rise" style="margin: 0; font-size: 30px; line-height: 1.1; font-weight: 800; letter-spacing: -1px; animation-delay: .5s">Your people for
+<span style="display: inline-block; vertical-align: bottom; height: 34px; overflow: hidden">
+<span class="ticker" style="display: flex; flex-direction: column">
+<span style="height: 34px; color: #6EA8FF">football</span>
+<span style="height: 34px; color: #FF9A4D">karting</span>
+<span style="height: 34px; color: #C79BFF">film nights</span>
+<span style="height: 34px; color: #FF6FA8">gigs</span>
+<span style="height: 34px; color: #6EA8FF">football</span>
+</span>
+</span>
+</h1>
+<p class="rise" style="margin: 8px 0 0; font-size: 15px; color: #A9A1BC; animation-delay: .6s">Students only. Sign up with your uni email.</p>
+
+<div class="rise" style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px; animation-delay: .7s">
+<label class="field" style="display: flex; flex-direction: column; gap: 4px; background: #1F1A2B; border: 2px solid #2A2439; border-radius: 18px; padding: 10px 16px">
+<span style="font-size: 12px; font-weight: 700; color: #A9A1BC">First name</span>
+<input value="{{ name }}" onChange="{{ onName }}" placeholder="What should people call you?" style="border: 0; outline: none; background: transparent; color: #F5F2FA; font: 600 16px 'DM Sans', sans-serif; padding: 2px 0">
+</label>
+<label class="field" style="display: flex; flex-direction: column; gap: 4px; background: #1F1A2B; border: 2px solid {{ emailBorder }}; border-radius: 18px; padding: 10px 16px">
+<span style="font-size: 12px; font-weight: 700; color: #A9A1BC">Uni email</span>
+<span style="display: flex; align-items: center; gap: 8px">
+<input type="email" value="{{ email }}" onChange="{{ onEmail }}" placeholder="you@uni.ac.uk" style="flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: #F5F2FA; font: 600 16px 'DM Sans', sans-serif; padding: 2px 0">
+<sc-if value="{{ valid }}" hint-placeholder-val="{{ false }}">
+<span class="ok" style="flex: none; display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: #14111C; background: #D4FF4F; border-radius: 999px; padding: 4px 9px">
+<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>{{ uniGuess }}</span>
+</sc-if>
+</span>
+</label>
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #A9A1BC">
+<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#4FE3C1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg>
+We only check you're a student. Your email is never shown.
+</div>
+</div>
+
+<a href="Onboard2.dc.html" style="margin-top: auto; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 58px; border-radius: 20px; background: #D4FF4F; color: #14111C; text-decoration: none; font-weight: 800; font-size: 17px; box-shadow: 0 6px 0 #8FB32A">
+<span class="shine" aria-hidden="true"></span><span class="disp">Send my code</span>
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</a>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { name: 'Ammad', email: 'you@uni.ac.uk' };
+  }
+  renderVals() {
+    var self = this;
+    var email = this.state.email.trim().toLowerCase();
+    var valid = /^[^@\s]+@[^@\s]+\.ac\.uk$/.test(email);
+    var unis = { 'mdx': 'Middlesex', 'kcl': "King's", 'ucl': 'UCL', 'imperial': 'Imperial', 'qmul': 'Queen Mary', 'gold': 'Goldsmiths', 'lse': 'LSE' };
+    var guess = 'Student';
+    Object.keys(unis).forEach(function (k) { if (email.indexOf(k) !== -1) guess = unis[k]; });
+    return {
+      name: this.state.name,
+      email: this.state.email,
+      valid: valid,
+      uniGuess: guess,
+      emailBorder: valid ? '#D4FF4F' : '#2A2439',
+      onName: function (e) { self.setState({ name: e.target.value }); },
+      onEmail: function (e) { self.setState({ email: e.target.value }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

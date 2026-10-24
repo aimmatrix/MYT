@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "schemaVersion": 1,
+      "id": "arsenal-women-london-city-2026-11-15",
+      "title": "Watch Arsenal Women v London City Lionesses",
+      "description": "The match is listed by Arsenal for 15 November at Emirates Stadium. Going together is a group idea; no tickets or meeting have been arranged. Check the organiser's listing before committing.",
+      "interestId": "football",
+      "area": "Holloway, London",
+      "status": "available",
+      "timeOptions": [
+        {
+          "id": "kickoff",
+          "startAt": "2026-11-15T16:30:00Z",
+          "endAt": null,
+          "availabilityKeys": [
+            "weekend-day"
+          ]
+        }
+      ],
+      "cost": {
+        "amountPence": null,
+        "currency": "GBP",
+        "isEstimate": false
+      },
+      "source": {
+        "kind": "verified",
+        "url": "https://help.arsenal.com/support/solutions/articles/101000594163-fixture-and-event-timings-for-local-residents",
+        "checkedAt": "2026-10-24T11:28:15Z"
+      },
+      "suggestedMeetingPoint": "A public spot near Arsenal station, to be agreed by the group"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "spurs-ipswich-2026-11-21",
+      "title": "Watch Tottenham Hotspur v Ipswich Town",
+      "description": "Tottenham lists this home match for 21 November at 3 pm. Attending as a group is only a suggestion; tickets and a meeting place are not arranged. Recheck the fixture before making a plan.",
+      "interestId": "football",
+      "area": "Tottenham, London",
+      "status": "available",
+      "timeOptions": [
+        {
+          "id": "kickoff",
+          "startAt": "2026-11-21T15:00:00Z",
+          "endAt": null,
+          "availabilityKeys": [
+            "weekend-day"
+          ]
+        }
+      ],
+      "cost": {
+        "amountPence": null,
+        "currency": "GBP",
+        "isEstimate": false
+      },
+      "source": {
+        "kind": "verified",
+        "url": "https://www.tottenhamhotspur.com/news/1091527/premier-league-fixture-changes-november-2026",
+        "checkedAt": "2026-10-24T11:28:15Z"
+      },
+      "suggestedMeetingPoint": "A public spot near Tottenham Hotspur Stadium, to be agreed by the group"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "karting-east-london-demo",
+      "title": "Try indoor karting in East London",
+      "description": "Demo activity idea. Pick a time with others, then check a venue's availability, age rules and prices before booking. No session has been verified or reserved.",
+      "interestId": "karting",
+      "area": "East London, venue to choose",
+      "status": "available",
+      "timeOptions": [
+        {
+          "id": "sat-afternoon",
+          "startAt": "2026-11-07T14:00:00Z",
+          "endAt": null,
+          "availabilityKeys": [
+            "weekend-day"
+          ]
+        },
+        {
+          "id": "sun-afternoon",
+          "startAt": "2026-11-08T14:00:00Z",
+          "endAt": null,
+          "availabilityKeys": [
+            "weekend-day"
+          ]
+        }
+      ],
+      "cost": {
+        "amountPence": null,
+        "currency": "GBP",
+        "isEstimate": false
+      },
+      "source": {
+        "kind": "demo",
+        "url": null,
+        "checkedAt": null
+      },
+      "suggestedMeetingPoint": "A public meeting point near the chosen venue, to be agreed"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "karting-south-london-demo",
+      "title": "Plan a karting afternoon in South London",
+      "description": "Demo activity idea. The group can choose a slot, then confirm an actual venue, opening hours and ticket cost. No session has been verified or reserved.",
+      "interestId": "karting",
+      "area": "South London, venue to choose",
+      "status": "available",
+      "timeOptions": [
+        {
+          "id": "sat-afternoon",
+          "startAt": "2026-11-14T15:00:00Z",
+          "endAt": null,
+          "availabilityKeys": [
+            "weekend-day"
+          ]
+        },
+        {
+          "id": "sun-afternoon",
+          "startAt": "2026-11-15T14:00:00Z",
+          "endAt": null,
+          "availabilityKeys": [
+            "weekend-day"
+          ]
+        }
+      ],
+      "cost": {
+        "amountPence": null,
+        "currency": "GBP",
+        "isEstimate": false
+      },
+      "source": {
+        "kind": "demo",
+        "url": null,
+        "checkedAt": null
+      },
+      "suggestedMeetingPoint": "A public meeting point near the chosen venue, to be agreed"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "cinema-central-london-demo",
+      "title": "Choose a film together in central London",
+      "description": "Demo activity idea. Choose a time first, then confirm a specific film, cinema and screening before purchasing tickets. No screening has been verified.",
+      "interestId": "cinema",
+      "area": "Central London, cinema to choose",
+      "status": "available",
+      "timeOptions": [
+        {
+          "id": "fri-evening",
+          "startAt": "2026-11-06T19:00:00Z",
+          "endAt": null,
+          "availabilityKeys": [
+            "weekday-evening"
+          ]
+        },
+        {
+          "id": "sat-evening",
+          "startAt": "2026-11-07T19:00:00Z",
+          "endAt": null,
+          "availabilityKeys": [
+            "weekend-evening"
+          ]
+        }
+      ],
+      "cost": {
+        "amountPence": null,
+        "currency": "GBP",
+        "isEstimate": false
+      },
+      "source": {
+        "kind": "demo",
+        "url": null,
+        "checkedAt": null
+      },
+      "suggestedMeetingPoint": "The cinema foyer once a venue is chosen"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "cinema-east-london-demo",
+      "title": "Plan an East London cinema night",
+      "description": "Demo activity idea. Agree on a time and group, then check a cinema's actual listings and price. No film or screening has been verified.",
+      "interestId": "cinema",
+      "area": "East London, cinema to choose",
+      "status": "available",
+      "timeOptions": [
+        {
+          "id": "fri-evening",
+          "startAt": "2026-11-13T19:30:00Z",
+          "endAt": null,
+          "availabilityKeys": [
+            "weekday-evening"
+          ]
+        },
+        {
+          "id": "sun-evening",
+          "startAt": "2026-11-15T18:30:00Z",
+          "endAt": null,
+          "availabilityKeys": [
+            "weekend-evening"
+          ]
+        }
+      ],
+      "cost": {
+        "amountPence": null,
+        "currency": "GBP",
+        "isEstimate": false
+      },
+      "source": {
+        "kind": "demo",
+        "url": null,
+        "checkedAt": null
+      },
+      "suggestedMeetingPoint": "The cinema foyer once a venue is chosen"
+    }
+  ]
+}
